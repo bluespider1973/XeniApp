@@ -1,0 +1,166 @@
+const fs = require('fs');
+const Jimp = require('jimp');
+const CryptoJS = require('crypto-js');
+const getMetadata = require('url-metadata');
+
+const db = require('../models');
+const {Generate, sendSimpleMail} = require('../lib');
+const ImageProcessing = require('../lib/imageProcessing');
+
+const User = db.user;
+const TokenHistory = db.tokenHistory;
+const Video = db.video;
+const DeletedFile = db.deletedFile;
+
+var global_data = require('../tools/GlobalData');
+const API_URL = global_data.back_end_server_ip + ':' + global_data.back_end_server_port + '/api/image/getImageFile/';
+
+
+const uploadVideo = async(req, res)=>{
+    const {user_id, access_key, video_id} = req.query;
+
+    try{
+        User.findOne({
+            where: {
+                user_id: user_id
+            }
+        }).then(async user=>{
+            if(!user){
+                return res.status(404).send({
+                    message: "Invalid User Id."
+                });
+            }
+            if(user.access_key !== access_key){
+                return res.status(403).send({
+                    message: "Forbidden."
+                })
+            }
+           
+            let meta_title, meta_image, meta_keyword, meta_description;
+            await getMetadata(video_id).then((metadata) => {
+                meta_title = metadata.title;
+                meta_image = metadata.image;
+                meta_keyword = metadata.keyword;
+                meta_description = metadata.description;
+            },(error) => {
+                res.status(200).send({
+                    message: error.message,
+                });
+            })
+
+            const video = await Video.create({
+                video_id,
+                meta_title,
+                meta_image,
+                meta_keyword,
+                meta_description, 
+            });
+
+            user.addVideo(video).then(async result=>{
+                res.status(200).send({
+                    message: "success",
+                });
+            }).catch(err=>{
+                res.status(500).send({
+                    message: err.message
+                })
+            })
+
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message
+            });
+        })
+    } catch(err){
+        res.status(500).send({
+            message: err
+        })
+    }
+}
+
+const removeVideo = (req, res) =>{
+    const {user_id, user_key} = req.query;
+    const id = req.params.id;
+
+    User.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(async (user)=>{
+        if(!user){
+            return res.status(404).send({                
+                message: "User Not Found."
+            });
+        }
+        if(user.access_key != user_key){
+            return res.status(400).send({                
+                message: "Invalid User Key."
+            });
+        }
+        
+        const video = await Video.findOne({
+            where: { id: id }
+        });
+        if(!video){
+            return res.status(404).send({                
+                message: "Invalid Image Id."
+            });
+        }
+
+        await video.destroy();
+
+        return res.status(200).send({
+            message: "success"
+        })
+
+    }).catch((err)=>{
+        return res.status(500).send({
+            message: err.message,
+        })
+    });
+}
+
+const getAllVideoList = (req, res)=>{
+    const {user_id, user_key} = req.query;
+
+    User.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(async user=>{
+        if(!user){
+            return res.status(404).send({
+                message: "User Not Found."
+            });
+        }
+        if(user.access_key!=user_key){
+            return res.status(400).send({
+                message: "Invalid User Key."
+            });
+        }
+        const videos = await user.getVideo();
+
+        let fileInfos = [];
+		list_counter = 1;
+
+		await videos.forEach(video => {
+            fileInfos.push({
+                id: video.id,
+                video_id: video.video_id,
+                meta_title: video.meta_title,
+                meta_image: video.meta_image,
+                meta_keyword: video.meta_keyword,
+                meta_description: video.meta_description, 
+                id_counter: list_counter++,
+                dateTime: video.createdAt,
+            });
+        });
+        res.status(200).send(fileInfos);
+    })
+}
+
+module.exports = {
+    uploadVideo,
+    removeVideo,
+    getAllVideoList,
+}
