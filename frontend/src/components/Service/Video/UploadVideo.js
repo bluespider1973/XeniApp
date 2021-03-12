@@ -579,14 +579,16 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
+                    
                     <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
-                    <select  className="mr-2" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                    <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+
+                    <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
                         <option></option>
                         {props.playlists.map((item) => {
                             return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
                         })}
                     </select>
-                    <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                 </Media.Body>
             </Media>
         </ListGroup.Item>
