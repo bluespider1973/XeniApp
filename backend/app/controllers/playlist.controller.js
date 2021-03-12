@@ -125,16 +125,17 @@ const getAllPlaylist = (req, res)=>{
         }
 
         const playlists = await user.getPlaylist();
-        console.log("asdf");
-        let fileInfos = [];
 
+        
+        let fileInfos = [];
+        
 		await playlists.forEach(playlist => {
             fileInfos.push({
                 id: playlist.id,
                 playlist_id: playlist.playlist_id,
                 playlist_title: playlist.playlist_title,
                 playlist_status: playlist.playlist_status,
-                dateTime: video.createdAt,
+                dateTime: playlist.createdAt,
             });
         });
         res.status(200).send(fileInfos);
