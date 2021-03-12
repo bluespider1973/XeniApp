@@ -101,30 +101,36 @@ const SettingDialog = (props) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <TextField
-                    className={classes.linkInput}
-                    id="input-with-icon-textfield-top"
-                    placeholder="Input a new playlist name to change."
-                    value={props.currentPlaylistTitle}
-                    onChange={(e) => props.setCurrentPlaylistTitle(e.target.value)}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                        <InputIcon />
-                        </InputAdornment>
-                        ),
-                    }}
-                />
-                <Select className="mr-4"
-                      style={{width: "100px"}}
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={props.currentPlaylistStatus}
-                      onChange={(e) => props.setCurrentPlaylistStatus(e.target.value)}
-                    >
-                        <MenuItem value={1}>Public</MenuItem>
-                        <MenuItem value={0}>Private</MenuItem>
-                    </Select>
+                <Row>
+                    <Col md={8}>
+                        <TextField
+                            className={classes.linkInput}
+                            id="input-with-icon-textfield-top"
+                            placeholder="Input a new playlist name to change."
+                            value={props.currentPlaylistTitle}
+                            onChange={(e) => props.setCurrentPlaylistTitle(e.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                <InputIcon />
+                                </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </Col>
+                    <Col md={4}>
+                        <Select className="mr-4"
+                        style={{width: "100px"}}
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={props.currentPlaylistStatus}
+                        onChange={(e) => props.setCurrentPlaylistStatus(e.target.value)}
+                        >
+                            <MenuItem value={1}>Public</MenuItem>
+                            <MenuItem value={0}>Private</MenuItem>
+                        </Select>
+                    </Col>
+                </Row>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={props.onSave}>Save</Button>
