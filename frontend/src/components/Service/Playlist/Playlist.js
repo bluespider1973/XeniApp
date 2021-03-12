@@ -21,6 +21,7 @@ import IconButton from '@material-ui/core/IconButton';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
+import GlobalData from '../../../tools/GlobalData';
 
 import {
     Row,
@@ -34,6 +35,8 @@ import {
 
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
+
+const back_end_server = GlobalData.back_end_server_ip + ":3000";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -479,7 +482,7 @@ const VideoList = (props) => {
                     <TextField
                         disabled
                         className={classes.margin}
-                        value={props.currentPlaylistId && 'http://videnda.com/playlist/' + props.currentPlaylistId}
+                        value={props.currentPlaylistId && back_end_server + '/videolist/' + props.currentPlaylistId}
                         style={{width: "85%"}}
                         InputProps={{
                             startAdornment: (
@@ -489,7 +492,7 @@ const VideoList = (props) => {
                             ),
                         }}
                     />
-                    <Button onClick={() => {navigator.clipboard.writeText('http://videnda.com/playlist/' + props.currentPlaylistId)}}>Copy</Button>
+                    <Button onClick={() => {navigator.clipboard.writeText(back_end_server + '/videolist/' + props.currentPlaylistId)}}>Copy</Button>
                 </Paper>
                 <TextField
                     className={classes.margin}

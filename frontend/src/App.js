@@ -34,6 +34,7 @@ import EditPPT from './components/Service/PPT/EditPPT';
 // video
 import UploadVideo from './components/Service/Video/UploadVideo'
 import Playlist from './components/Service/Playlist/Playlist'
+import VideoList from './components/Service/Playlist/VideoList'
 
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -115,6 +116,7 @@ function App() {
           <Route path="/manage_ppt/edit_ppt/:ppt_id" component={EditPPT} />
           <Route path="/upload_video" component={UploadVideo} />
           <Route path="/playlist" component={Playlist} />
+          <Route path="/videolist/:playlist_id" component={VideoList} />
           <Route path="/user" component={BoardUser} />
           <Route path="/mod" component={BoardModerator} />
           <Route path="/admin" component={BoardAdmin} />
