@@ -84,7 +84,7 @@ const removePlaylist = (req, res) =>{
         }
         
         const playlist = await Playlist.findOne({
-            where: { id: id }
+            where: { playlist_id: id }
         });
         if(!playlist){
             return res.status(404).send({                
@@ -104,6 +104,53 @@ const removePlaylist = (req, res) =>{
         })
     });
 }
+
+
+const changePlaylist = (req, res) =>{
+    const {user_id, user_key, currentPlaylistTitle, currentPlaylistStatus} = req.query;
+    const id = req.params.id;
+
+    User.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(async (user)=>{
+        if(!user){
+            return res.status(404).send({                
+                message: "User Not Found."
+            });
+        }
+        if(user.access_key != user_key){
+            return res.status(400).send({                
+                message: "Invalid User Key."
+            });
+        }
+        
+        const playlist = await Playlist.findOne({
+            where: { playlist_id: id }
+        });
+        if(!playlist){
+            return res.status(404).send({                
+                message: "Invalid Image Id."
+            });
+        }
+
+        await playlist.update({
+            playlist_title: currentPlaylistTitle,
+            playlist_status: currentPlaylistStatus,
+        })
+
+        return res.status(200).send({
+            message: "success"
+        })
+
+    }).catch((err)=>{
+        return res.status(500).send({
+            message: err.message,
+        })
+    });
+}
+
 
 const getAllPlaylist = (req, res)=>{
     const {user_id, access_key} = req.query;
@@ -143,7 +190,7 @@ const getAllPlaylist = (req, res)=>{
 }
 
 const getPlaylist = (req, res)=>{
-    const {user_id, user_key, playlist_id} = req.query;
+    const {user_id, access_key, playlist_id} = req.query;
 
     User.findOne({
         where: {
@@ -155,7 +202,7 @@ const getPlaylist = (req, res)=>{
                 message: "User Not Found."
             });
         }
-        if(user.access_key!=user_key){
+        if(user.access_key!=access_key){
             return res.status(400).send({
                 message: "Invalid User Key."
             });
@@ -178,6 +225,7 @@ const getPlaylist = (req, res)=>{
                 dateTime: video.createdAt,
             });
         });
+
         res.status(200).send(fileInfos);
     })
 }
@@ -185,6 +233,7 @@ const getPlaylist = (req, res)=>{
 module.exports = {
     addPlaylist,
     removePlaylist,
+    changePlaylist,
     getAllPlaylist,
     getPlaylist,
 }

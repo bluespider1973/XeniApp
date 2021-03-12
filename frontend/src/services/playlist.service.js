@@ -18,6 +18,11 @@ class PlaylistService {
     return axios.post(`${PLAYLIST_API_URL}removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
   }
 
+  changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${PLAYLIST_API_URL}changePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&currentPlaylistTitle=${currentPlaylistTitle}&currentPlaylistStatus=${currentPlaylistStatus}`);
+  }
+
   getAllPlaylist() {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${PLAYLIST_API_URL}getAllPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}`);
@@ -25,7 +30,7 @@ class PlaylistService {
 
   getPlaylist(playlist_id) {
     const currentUser = Auth.getCurrentUser();
-    return axios.get(`${PLAYLIST_API_URL}getPlaylist?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
+    return axios.get(`${PLAYLIST_API_URL}getPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
   }
 }
 

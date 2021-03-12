@@ -59,6 +59,7 @@ const getVideoId = (url) => {
 } 
 
 
+
 const MyVerticallyCenteredModal = (props) => {
 
     return (
@@ -83,10 +84,60 @@ const MyVerticallyCenteredModal = (props) => {
     );
 }
 
+const SettingDialog = (props) => {
+
+    const classes = useStyles();
+
+    return (
+        <Modal
+            {...props}
+            size="md"
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+        >
+            <Modal.Header closeButton>
+                <Modal.Title id="contained-modal-title-vcenter">
+                    Playlist Infomation
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <TextField
+                    className={classes.linkInput}
+                    id="input-with-icon-textfield-top"
+                    placeholder="Input a new playlist name to change."
+                    value={props.currentPlaylistTitle}
+                    onChange={(e) => props.setCurrentPlaylistTitle(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                        <InputIcon />
+                        </InputAdornment>
+                        ),
+                    }}
+                />
+                <Select className="mr-4"
+                      style={{width: "100px"}}
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={props.currentPlaylistStatus}
+                      onChange={(e) => props.setCurrentPlaylistStatus(e.target.value)}
+                    >
+                        <MenuItem value={1}>Public</MenuItem>
+                        <MenuItem value={0}>Private</MenuItem>
+                    </Select>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="success" onClick={props.onSave}>Save</Button>
+                <Button variant="secondary" onClick={props.onDelete}>Delete</Button>
+                <Button variant="primary" onClick={props.onHide}>Close</Button>
+            </Modal.Footer>
+        </Modal>
+    );
+}
 
 export default () => {
     const [message, setMessage] = React.useState("");
-    const [pageNumber, setPageNumber] = React.useState(localStorage.getItem('page') ? Number(localStorage.getItem('page')) : 1);
+    const [pageNumber, setPageNumber] = React.useState(localStorage.getItem('playlistpage') ? Number(localStorage.getItem('playlistpage')) : 1);
     const [itemsPerPage] = React.useState(10);
     const [totalPages, setTotalPages] = React.useState(1);
     const [treeData, setTreeData] = useState('');
@@ -97,93 +148,15 @@ export default () => {
     const [videoData, setVideoData] = useState([]);
     const [videoInfos, setVideoInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
+    const [settingShow, setSettingShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
-    const [playlistId, setPlaylistId] = useState('');
     const [playlistTitle, setPlaylistTitle] = useState('');
     const [playlistStatus, setPlaylistStatus] = useState(1);
     const [currentPlaylistId, setCurrentPlaylistId] = useState('');
     const [playlistData, setPlaylistData] = useState([]);
+    const [currentPlaylistTitle, setCurrentPlaylistTitle] = useState('');
+    const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
     
-    useEffect(() => {
-        setExpand()
-    }, [])
-
-    const setExpand = () => {
-        const selectedNode = localStorage.getItem('selected');
-        let expand = ['root'];
-        if (selectedNode) {
-            let y, m ,d;
-            if (selectedNode.length === 4 && Number(selectedNode) > 1000) {
-                y = selectedNode
-                expand.push(y)
-            } else if (selectedNode.length === 7) {
-                y = selectedNode.split("-")[0];
-                m = selectedNode.split("-")[1];
-                expand.push(y)
-                expand.push(y + '-' + m)
-            } else if (selectedNode.length === 10) {
-                y = selectedNode.split("-")[0];
-                m = selectedNode.split("-")[1];
-                d = selectedNode.split("-")[2];
-                expand.push(y)
-                expand.push(y + '-' + m)
-                expand.push(y + '-' + m + '-' + d)
-            }
-        }
-        setExpanded(expand)
-    }
-
-    // set tree data
-    const setTree = (plain) => {
-        const data = {
-            id: 'root',
-            name: 'All Videos',
-            children: [],
-        };
-        plain.forEach(value => {
-            let [year, month, day] = new Date(value.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
-
-            let index = data.children.findIndex(item => item.id === String(year))
-            if( index < 0) {
-                data.children.push({
-                    id: year.toString(),
-                    name: year.toString(),
-                    children: [{
-                        id: year + '-' + month,
-                        name: month,
-                        children: [{
-                            id: year + '-' + month + '-' + day,
-                            name: day,
-                        }]
-                    }]
-                })
-            } else {
-                let month_index = data.children[index].children.findIndex(item => String(item.id) === year+'-'+month)
-                if (month_index < 0) {
-                    data.children[index].children.push({
-                        id: year+'-'+month,
-                        name: month,
-                        children: [{
-                            id: year+'-'+month+'-'+day,
-                            name: day,
-                        }]
-                    })
-                } else {
-                    let day_index = data.children[index].children[month_index].children.findIndex(item => String(item.id) === year+'-'+month+'-'+day)
-                    if (day_index < 0) {
-                        data.children[index].children[month_index].children.push({
-                            id: year+'-'+month+'-'+day,
-                            name: day,
-                        })
-                    }
-                }
-            }
-            
-        });
-        
-        setTreeData(data);
-    }
-
     React.useEffect(() => {
         getAllPlaylists();
     }, [])
@@ -195,33 +168,13 @@ export default () => {
                     setPlaylistData(response.data);
                 }
             })
-
-        PlaylistService.getPlaylist(currentPlaylistId)
-            .then(async response => {
-                if(response.data && response.data.length>0) {
-
-                    setVideoInfos(response.data);
-                    
-                    const total = Math.ceil(response.data.length / itemsPerPage);
-                    setTotalPages(total);
-                }
-            })
     }
 
     // Add playlist
     const upload = () => {
-        //setProgressVisible(true);
 
         PlaylistService.addPlaylist(playlistTitle, playlistStatus)
             .then(response => {
-                setMessage(response.data.message);
-                setAlertVisible(true)
-                setTimeout(() => {
-                    setAlertVisible(false)
-                }, 2000)
-
-                setProgressVisible(false);
-
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setPlaylistTitle('');
@@ -231,166 +184,35 @@ export default () => {
 
     const handleChangePageNumber = (pagenum)=>{
         setPageNumber(pagenum);
-        localStorage.setItem('page', pagenum)
+        localStorage.setItem('playlistpage', pagenum)
     }
 
     const handleChangeKeyword = (key) => {
         const keyword = key.trim().toLowerCase();
         const nodeId = selected;
         let data = videoData.filter(item => {
-            let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
-
-            let selectedYear = '';
-            let selectedMonth = '';
-            let selectedDay = '';
-
             let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
             fileName = fileName.trim().toLowerCase();
 
-            if (nodeId === 'root') {
-                if (keyword === "") {
-                    return 1;    
-                } else {
-                    if (fileName.includes(keyword)) {
-                        return 1;
-                    }
-                }
+            if (fileName.includes(keyword)) {
+                return 1;
+            } else {
+                return 0;
             }
-
-            let selectedDate = '';
-            if (String(nodeId).length === 4) {
-                selectedYear = String(nodeId);
-                if (selectedYear === year) {
-                    if (keyword === "") {
-                        return 1;    
-                    } else {
-                        if (fileName.includes(keyword)) {
-                            return 1;
-                        }
-                    }
-                }
-            }
-        
-            if (String(nodeId).length >= 6) {
-                selectedDate = nodeId.split('-');
-                selectedYear = selectedDate[0];
-                selectedMonth = selectedDate[1];
-                if (selectedYear === year && selectedMonth === month && nodeId.split('-').length === 2) {
-                    if (keyword === "") {
-                        return 1;    
-                    } else {
-                        if (fileName.includes(keyword)) {
-                            return 1;
-                        }
-                    }
-                }
-                if (String(nodeId).length >= 8) {
-                    selectedDay = nodeId.split('-')[2];
-                    if (selectedYear === year && selectedMonth === month && selectedDay === day) {
-                        if (keyword === "") {
-                            return 1;    
-                        } else {
-                            if (fileName.includes(keyword)) {
-                                return 1;
-                            }
-                        }
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-            return 0;
         });
-        
-        setVideoInfos(data);
+
+        console.log(videoInfos)
+
+        if (keyword == "") {
+            setVideoInfos(videoData);
+        } else {
+            setVideoInfos(data);
+        }
     
         const total = Math.ceil(data.length / itemsPerPage);
         setTotalPages(total);
 
-        localStorage.removeItem("page");
-        setPageNumber(1);
-    }
-
-    const handleNodeSelect = (event, nodeId, keyword) => {
-        if (keyword === "") {
-            document.getElementById('input-with-icon-textfield').value = '';
-        }
-        {
-            setSelected(nodeId);        // e.g. 2020-3-5
-            localStorage.setItem("selected", nodeId);
-            setExpand();
-            let data = videoData.filter(item => {
-                let [year, month, day] = new Date(item.dateTime).toLocaleDateString('pt-br').split( '/' ).reverse( );
-
-                let selectedYear = '';
-                let selectedMonth = '';
-                let selectedDay = '';
-
-                let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
-                fileName = fileName.trim().toLowerCase();
-
-                if (nodeId === 'root') {
-                    if (keyword === "") {
-                        return 1;    
-                    } else {
-                        if (fileName.includes(keyword)) {
-                            return 1;
-                        }
-                    }
-                }
-
-                let selectedDate = '';
-                if (String(nodeId).length === 4) {
-                    selectedYear = String(nodeId);
-                    if (selectedYear === year) {
-                        if (keyword === "") {
-                            return 1;    
-                        } else {
-                            if (fileName.includes(keyword)) {
-                                return 1;
-                            }
-                        }
-                    }
-                }
-            
-                if (String(nodeId).length >= 6) {
-                    selectedDate = nodeId.split('-');
-                    selectedYear = selectedDate[0];
-                    selectedMonth = selectedDate[1];
-                    if (selectedYear === year && selectedMonth === month && nodeId.split('-').length === 2) {
-                        if (keyword === "") {
-                            return 1;    
-                        } else {
-                            if (fileName.includes(keyword)) {
-                                return 1;
-                            }
-                        }
-                    }
-                    if (String(nodeId).length >= 8) {
-                        selectedDay = nodeId.split('-')[2];
-                        if (selectedYear === year && selectedMonth === month && selectedDay === day) {
-                            if (keyword === "") {
-                                return 1;    
-                            } else {
-                                if (fileName.includes(keyword)) {
-                                    return 1;
-                                }
-                            }
-                        } else {
-                            return 0;
-                        }
-                    }
-                }
-                return 0;
-            });
-            
-            setVideoInfos(data);
-        
-            const total = Math.ceil(data.length / itemsPerPage);
-            setTotalPages(total);
-        }
-
-        localStorage.removeItem("page");
+        localStorage.removeItem("playlistpage");
         setPageNumber(1);
     }
 
@@ -425,6 +247,55 @@ export default () => {
     const handlePlayVideo = (video_url) => {
         setModalShow(true);
         setPlayUrl(video_url);
+    }
+
+
+    const handleItemClick = (playlist_id, playlist_title, playlist_status) => {
+        setCurrentPlaylistId(playlist_id);
+        setCurrentPlaylistTitle(playlist_title);
+        setCurrentPlaylistStatus(playlist_status);
+
+        PlaylistService.getPlaylist(playlist_id)
+        .then(async response => {
+            if(response.data && response.data.length>0) {
+
+                setVideoData(response.data);
+                setVideoInfos(response.data);
+                
+                const total = Math.ceil(response.data.length / itemsPerPage);
+                setTotalPages(total);
+            } else {
+                setVideoInfos([]);
+            }
+        })
+    }
+
+    // delete
+    const handleSettingShow = () => {
+        setSettingShow(false)
+   
+        PlaylistService.removePlaylist(currentPlaylistId)
+            .then(response => {
+                if (response.data.message === 'success') {
+                    getAllPlaylists();
+                    setCurrentPlaylistId('');
+                }
+            })
+    }
+
+    // change
+    const handleSettingSave = () => {
+        setSettingShow(false)
+        console.log(currentPlaylistTitle, currentPlaylistStatus)
+        PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus)
+        .then(response => {
+            if (response.data.message === 'success') {
+                getAllPlaylists();
+                setCurrentPlaylistId('');
+                setCurrentPlaylistTitle('');
+                setCurrentPlaylistStatus('');
+            }
+        })
     }
 
     const classes = useStyles();
@@ -494,37 +365,26 @@ export default () => {
                     
                     {playlistData && (
                         playlistData.map(item => {
-                            return 'asdfasdfas'
+                            return (
+                                <ListItem button key={item.id}
+                                            selected={currentPlaylistId == item.playlist_id}
+                                            onClick={() => handleItemClick(item.playlist_id, item.playlist_title, item.playlist_status)}
+                                 >
+                                    <ListItemAvatar>
+                                        <Avatar>
+                                            {item.playlist_status == 1 ? <FolderIcon /> : <FolderSharedIcon />}
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={item.playlist_title} />
+                                    <ListItemSecondaryAction>
+                                        <IconButton edge="end" aria-label="delete" disabled={currentPlaylistId !== item.playlist_id} onClick={() => setSettingShow(true)}>
+                                            <SettingsIcon/>
+                                        </IconButton>
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            )
                         })
                     )}
-
-                    <ListItem button selected>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <FolderIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary="My Playlist" />
-                      <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete">
-                          <SettingsIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-
-                    <ListItem button>
-                      <ListItemAvatar>
-                        <Avatar>
-                          <FolderSharedIcon />
-                        </Avatar>
-                      </ListItemAvatar>
-                      <ListItemText primary="My Playlist" />
-                      <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete">
-                          <SettingsIcon />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
 
                   </List>
                 </Col>
@@ -535,7 +395,7 @@ export default () => {
                             totalPages={totalPages}
                             itemsPerPage={itemsPerPage}
                             currentPage={pageNumber}
-                            playlistId={playlistId}
+                            currentPlaylistId={currentPlaylistId}
                             onChangeKeyword={handleChangeKeyword}
                             onChangePageNumber={handleChangePageNumber}
                             handleRemoveItem={handleRemoveItem}
@@ -548,6 +408,16 @@ export default () => {
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
+            />
+            <SettingDialog
+                show={settingShow}
+                onHide={() => setSettingShow(false)}
+                onDelete={handleSettingShow}
+                onSave={handleSettingSave}
+                setCurrentPlaylistTitle={setCurrentPlaylistTitle}
+                setCurrentPlaylistStatus={setCurrentPlaylistStatus}
+                currentPlaylistTitle={currentPlaylistTitle}
+                currentPlaylistStatus={currentPlaylistStatus}
             />
         </>
     );
@@ -603,7 +473,7 @@ const VideoList = (props) => {
                     <TextField
                         disabled
                         className={classes.margin}
-                        value={props.playlistId}
+                        value={props.currentPlaylistId && 'http://videnda.com/playlist/' + props.currentPlaylistId}
                         style={{width: "85%"}}
                         InputProps={{
                             startAdornment: (
@@ -613,7 +483,7 @@ const VideoList = (props) => {
                             ),
                         }}
                     />
-                    <Button>Copy</Button>
+                    <Button onClick={() => {navigator.clipboard.writeText('http://videnda.com/playlist/' + props.currentPlaylistId)}}>Copy</Button>
                 </Paper>
                 <TextField
                     className={classes.margin}
@@ -631,13 +501,16 @@ const VideoList = (props) => {
                 <h3 className="card-header">List of Videos</h3>
                 <ListGroup variant="flush">
                     {props.videoInfos
-                        && props.videoInfos.map((video, index) => {
+                        && (props.videoInfos.map((video, index) => {
                             if((props.currentPage-1)*props.itemsPerPage <=index && (props.currentPage)*props.itemsPerPage > index ) {
                                 return renderItem(video)
                             } else {
                                 return null
                             }
-                        })}
+                        }))}
+                    { props.currentPlaylistId == '' &&
+                        <h3 className="m-auto">Select a playlist.</h3>
+                    }
                 </ListGroup>
                 {showPagenationItem()}
             </div>
