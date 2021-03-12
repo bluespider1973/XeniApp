@@ -20,8 +20,10 @@ import {
     Button,
     ListGroup,
     Media,
+    Form,
 } from 'react-bootstrap';
 
+import PlaylistService from '../../../services/playlist.service';
 import VideoService from '../../../services/video.service';
 import { LinearProgress } from '@material-ui/core';
 
@@ -89,13 +91,13 @@ const VideoUpload = () => {
     const [videoInfos, setVideoInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
+    const [playlists, setPlaylists] = useState([]);
 
     useEffect(() => {
         setExpand()
     }, [])
 
     const setExpand = () => {
-        // localStorage.getItem('selected') ? localStorage.getItem('selected')) :
         const selectedNode = localStorage.getItem('selected');
         let expand = ['root'];
         if (selectedNode) {
@@ -173,7 +175,19 @@ const VideoUpload = () => {
 
     React.useEffect(() => {
         getAllVideos();
+
+        //get playlists
+        getAllPlaylists();
     }, [])
+
+    const getAllPlaylists = () => {
+        PlaylistService.getAllPlaylist()
+            .then(async response => {
+                if(response.data && response.data.length>0) {
+                    setPlaylists(response.data);
+                }
+            })
+    }
 
     const getAllVideos = () => {
         VideoService.getAllVideoList()
@@ -451,6 +465,20 @@ const VideoUpload = () => {
         setPlayUrl(video_url);
     }
 
+
+    // playlist
+    const handlePlaylist = (e, video_id) => {
+        const playlist_title = e.target.value;
+        let playlist_id = '';
+
+        if (playlist_title != '') {
+            const selectedPlaylist = playlists.find(item => item.playlist_title == playlist_title);
+            playlist_id = selectedPlaylist.playlist_id;
+        }
+
+        VideoService.changeVideoGroup(video_id, playlist_id)
+    }
+
     const classes = useStyles();
 
     const renderTree = (nodes) => {
@@ -516,10 +544,12 @@ const VideoUpload = () => {
                             totalPages={totalPages}
                             itemsPerPage={itemsPerPage}
                             currentPage={pageNumber}
+                            playlists={playlists}
                             onChangeKeyword={handleChangeKeyword}
                             onChangePageNumber={handleChangePageNumber}
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
+                            onChangePlaylist={handlePlaylist}
                         />
                     }
                 </Col>
@@ -549,7 +579,13 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="success" size="sm" className="mr-3" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
+                    <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
+                    <select  className="mr-2" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                        <option></option>
+                        {props.playlists.map((item) => {
+                            return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
+                        })}
+                    </select>
                     <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                 </Media.Body>
             </Media>

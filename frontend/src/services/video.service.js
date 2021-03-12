@@ -17,6 +17,11 @@ class VideoService {
     return axios.post(`${VIDEO_API_URL}removeVideo/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
   }
 
+  changeVideoGroup(id, playlist_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${VIDEO_API_URL}changeVideoGroup/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&playlist_id=${playlist_id}`);
+  }
+
   getAllVideoList() {
     const currentUser = Auth.getCurrentUser();
     return axios.get(`${VIDEO_API_URL}getAllVideoList?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
