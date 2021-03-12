@@ -106,7 +106,7 @@ const removePlaylist = (req, res) =>{
 }
 
 const getAllPlaylist = (req, res)=>{
-    const {user_id, user_key} = req.query;
+    const {user_id, access_key} = req.query;
 
     User.findOne({
         where: {
@@ -118,7 +118,7 @@ const getAllPlaylist = (req, res)=>{
                 message: "User Not Found."
             });
         }
-        if(user.access_key!=user_key){
+        if(user.access_key!=access_key){
             return res.status(400).send({
                 message: "Invalid User Key."
             });

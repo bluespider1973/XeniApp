@@ -20,7 +20,7 @@ class PlaylistService {
 
   getAllPlaylist() {
     const currentUser = Auth.getCurrentUser();
-    return axios.get(`${PLAYLIST_API_URL}getAllPlaylist?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
+    return axios.get(`${PLAYLIST_API_URL}getAllPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}`);
   }
 
   getPlaylist(playlist_id) {
