@@ -191,8 +191,6 @@ export default () => {
     const getAllPlaylists = () => {
         PlaylistService.getAllPlaylist()
             .then(async response => {
-                console.log('--------------------------------------')
-                console.log(response.data)
                 if(response.data && response.data.length>0) {
                     setPlaylistData(response.data);
                 }
