@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import TreeItem from '@material-ui/lab/TreeItem';
 import { Pagination } from '@material-ui/lab';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
@@ -16,7 +15,6 @@ import {
 } from 'react-bootstrap';
 
 import PlaylistService from '../../../services/playlist.service';
-import VideoService from '../../../services/video.service';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,22 +72,24 @@ export default (props) => {
     const [videoInfos, setVideoInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
-    const [playlists, setPlaylists] = useState([]);
-    const [id, setId] = useState(null);
+    const [playlistId, setPlaylistId] = useState(null);
 
-    React.useEffect(() => {
-      setId(props.match.params.playlist_id);
+    useEffect(() => {
+      setPlaylistId(props.match.params.playlist_id);
       getAllVideos();
     }, [props])
 
     const getAllVideos = () => {
-        VideoService.getAllVideoList()
+      if (!PlaylistService) {
+          return;
+      }
+      PlaylistService.getPublicPlaylist(playlistId)
             .then(async response => {
                 if(response.data && response.data.length>0) {
                     setVideoData(response.data)
                     setVideoInfos(response.data);
                     
-                    const total = Math.ceil(response.data.length/itemsPerPage);
+                    const total = Math.ceil(response.data.length / itemsPerPage);
                     setTotalPages(total);
                 }
             })
@@ -124,45 +124,11 @@ export default (props) => {
         setPageNumber(1);
     }
 
-    // Remove one video item
-    const handleRemoveItem = (id) => {
-        VideoService.removeVideo(id)
-            .then(response => {
-                if (response.data.message === "success") {
-                    let arr = [...videoInfos];
-                    arr = arr.filter(item => item.id !== id);
-                    setVideoInfos(arr);
-                }
-            }).catch((err) => {
-            });
-    }
-
     // Play one video
     const handlePlayVideo = (video_url) => {
         setModalShow(true);
         setPlayUrl(video_url);
     }
-
-
-    // playlist
-    const handlePlaylist = (e, video_id) => {
-        const playlist_title = e.target.value;
-        let playlist_id = '';
-
-        if (playlist_title != '') {
-            const selectedPlaylist = playlists.find(item => item.playlist_title == playlist_title);
-            playlist_id = selectedPlaylist.playlist_id;
-        }
-
-        VideoService.changeVideoGroup(video_id, playlist_id)
-    }
-
-    const renderTree = (nodes) => {
-        return (
-        <TreeItem key={nodes.id} nodeId={nodes.id} label={nodes.name}>
-            {Array.isArray(nodes.children) ? nodes.children.map((node) => renderTree(node)) : null}
-        </TreeItem>
-    )}
 
     return (
         <>
@@ -172,12 +138,9 @@ export default (props) => {
                     totalPages={totalPages}
                     itemsPerPage={itemsPerPage}
                     currentPage={pageNumber}
-                    playlists={playlists}
                     onChangeKeyword={handleChangeKeyword}
                     onChangePageNumber={handleChangePageNumber}
-                    handleRemoveItem={handleRemoveItem}
                     handlePlayVideo={handlePlayVideo}
-                    onChangePlaylist={handlePlaylist}
                 />
             }
             <MyVerticallyCenteredModal

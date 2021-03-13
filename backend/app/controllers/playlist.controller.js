@@ -230,10 +230,65 @@ const getPlaylist = (req, res)=>{
     })
 }
 
+const getPublicPlaylist = (req, res)=>{
+    const {user_id, access_key, playlist_id} = req.query;
+
+    User.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(async user=>{
+        if(!user){
+            return res.status(404).send({
+                message: "User Not Found."
+            });
+        }
+        if(user.access_key!=access_key){
+            return res.status(400).send({
+                message: "Invalid User Key."
+            });
+        }
+
+        const one = await Playlist.findOne({
+            where: {
+                playlist_id,
+            }
+        })
+
+        if (one.playlist_status == 1) {
+            const items = await Video.findAll({
+                where: { 
+                    playlist_id,
+                }
+            })
+    
+            let fileInfos = [];
+    
+            await items.forEach(video => {
+                fileInfos.push({
+                    id: video.id,
+                    video_id: video.video_id,
+                    meta_title: video.meta_title,
+                    meta_image: video.meta_image,
+                    meta_keyword: video.meta_keyword,
+                    meta_description: video.meta_description, 
+                    dateTime: video.createdAt,
+                });
+            });
+            res.status(200).send(fileInfos);
+        } else {
+            res.status(400).send({
+                message: "You cannot access this url directly."
+            });
+        }
+    })
+}
+
 module.exports = {
     addPlaylist,
     removePlaylist,
     changePlaylist,
     getAllPlaylist,
     getPlaylist,
+    getPublicPlaylist,
 }
