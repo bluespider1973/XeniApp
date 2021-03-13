@@ -239,6 +239,9 @@ const getPublicPlaylist = (req, res)=>{
             user_id: user_id
         }
     }).then(async user=>{
+
+        console.log(user.id)
+
         if(!user){
             return res.status(404).send({
                 message: "User Not Found."
@@ -256,8 +259,28 @@ const getPublicPlaylist = (req, res)=>{
             }
         })
 
-        // one.playlist_status == 1
-        if (1) {
+        if (one.userId == user.id) {
+            const items = await Video.findAll({
+                where: { 
+                    playlist_id,
+                }
+            })
+    
+            let fileInfos = [];
+    
+            await items.forEach(video => {
+                fileInfos.push({
+                    id: video.id,
+                    video_id: video.video_id,
+                    meta_title: video.meta_title,
+                    meta_image: video.meta_image,
+                    meta_keyword: video.meta_keyword,
+                    meta_description: video.meta_description, 
+                    dateTime: video.createdAt,
+                });
+            });
+            res.status(200).send(fileInfos);
+        } else if (one.playlist_status == 1) {
             const items = await Video.findAll({
                 where: { 
                     playlist_id,
@@ -279,8 +302,8 @@ const getPublicPlaylist = (req, res)=>{
             });
             res.status(200).send(fileInfos);
         } else {
-            res.status(400).send({
-                message: "You cannot access this url directly."
+            res.status(200).send({
+                message: "cannot_access"
             });
         }
     })

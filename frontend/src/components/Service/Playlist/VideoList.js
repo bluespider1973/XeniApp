@@ -6,6 +6,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import Modal from 'react-bootstrap/Modal';
 import ReactPlayer from 'react-player';
+import { useHistory } from "react-router-dom";
 
 import {
     Image,
@@ -73,26 +74,32 @@ export default (props) => {
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
     const [playlistId, setPlaylistId] = useState(null);
+    let history = useHistory();
 
     useEffect(() => {
       setPlaylistId(props.match.params.playlist_id);
-      getAllVideos();
+      if (localStorage.getItem("user") ) {
+          getAllVideos();
+      } else {
+          history.push("/404");
+      }
     }, [props])
 
     const getAllVideos = () => {
-      if (!PlaylistService) {
-          return;
-      }
       PlaylistService.getPublicPlaylist(playlistId)
-            .then(async response => {
-                if(response.data && response.data.length>0) {
-                    setVideoData(response.data)
-                    setVideoInfos(response.data);
-                    
-                    const total = Math.ceil(response.data.length / itemsPerPage);
-                    setTotalPages(total);
-                }
-            })
+      .then(async response => {
+        if (response.data.message == 'cannot_access') {
+            history.push("/404");
+        }
+        if(response.data && response.data.length>0) {
+
+            setVideoData(response.data)
+            setVideoInfos(response.data);
+            
+            const total = Math.ceil(response.data.length / itemsPerPage);
+            setTotalPages(total);
+        }
+      })
     }
 
     const handleChangePageNumber = (pagenum)=>{
