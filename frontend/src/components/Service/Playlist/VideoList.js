@@ -168,7 +168,7 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="primary" size="sm" style={{width: '100%'}} className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>
+                    <Button variant="primary" size="sm" style={{padding: '5px 20px'}} className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>
                       Play Video
                     </Button>
                 </Media.Body>

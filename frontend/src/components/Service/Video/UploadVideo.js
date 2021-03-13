@@ -584,7 +584,7 @@ const VideoList = (props) => {
                     <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
 
                     <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
-                        <option></option>
+                        <option value="">Non Playlist</option>
                         {props.playlists.map((item) => {
                             return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
                         })}

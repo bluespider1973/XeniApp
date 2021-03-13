@@ -222,6 +222,7 @@ const getPlaylist = (req, res)=>{
                 meta_image: video.meta_image,
                 meta_keyword: video.meta_keyword,
                 meta_description: video.meta_description, 
+                playlist_id: video.playlist_id,
                 dateTime: video.createdAt,
             });
         });
@@ -255,7 +256,8 @@ const getPublicPlaylist = (req, res)=>{
             }
         })
 
-        if (one.playlist_status == 1) {
+        // one.playlist_status == 1
+        if (1) {
             const items = await Video.findAll({
                 where: { 
                     playlist_id,

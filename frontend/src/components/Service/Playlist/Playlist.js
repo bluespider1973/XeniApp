@@ -32,6 +32,8 @@ import {
     ListGroup,
     Media,
 } from 'react-bootstrap';
+import VideoService from '../../../services/video.service';
+
 
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
@@ -165,7 +167,8 @@ export default () => {
     const [playlistData, setPlaylistData] = useState([]);
     const [currentPlaylistTitle, setCurrentPlaylistTitle] = useState('');
     const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
-    
+    const [playlists, setPlaylists] = useState([]);
+
     React.useEffect(() => {
         getAllPlaylists();
     }, [])
@@ -175,9 +178,13 @@ export default () => {
             .then(async response => {
                 if(response.data && response.data.length>0) {
                     setPlaylistData(response.data);
+                    setPlaylists(response.data);
+                    handleItemClick(response.data[0].playlist_id, response.data[0].playlist_title, response.data[0].playlist_status)
                 }
             })
     }
+
+
 
     // Add playlist
     const upload = () => {
@@ -258,6 +265,19 @@ export default () => {
         setPlayUrl(video_url);
     }
 
+    // playlist
+    const handlePlaylist = (e, video_id) => {
+        const playlist_title = e.target.value;
+        let playlist_id = '';
+
+        if (playlist_title != '') {
+            const selectedPlaylist = playlists.find(item => item.playlist_title == playlist_title);
+            playlist_id = selectedPlaylist.playlist_id;
+        }
+
+        VideoService.changeVideoGroup(video_id, playlist_id);
+        window.location.reload();
+    }
 
     const handleItemClick = (playlist_id, playlist_title, playlist_status) => {
         setCurrentPlaylistId(playlist_id);
@@ -288,6 +308,7 @@ export default () => {
                 if (response.data.message === 'success') {
                     getAllPlaylists();
                     setCurrentPlaylistId('');
+                    window.location.reload();
                 }
             })
     }
@@ -404,11 +425,13 @@ export default () => {
                             totalPages={totalPages}
                             itemsPerPage={itemsPerPage}
                             currentPage={pageNumber}
+                            playlists={playlists}
                             currentPlaylistId={currentPlaylistId}
                             onChangeKeyword={handleChangeKeyword}
                             onChangePageNumber={handleChangePageNumber}
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
+                            onChangePlaylist={handlePlaylist}
                         />
                     }
                 </Col>
@@ -435,7 +458,7 @@ export default () => {
 
 const VideoList = (props) => {
     const classes = useStyles();
-
+    
     const renderItem = (data) => (
         <ListGroup.Item key={data.id}>
             <Media>
@@ -450,6 +473,13 @@ const VideoList = (props) => {
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
                     <Button variant="success" size="sm" className="mr-3" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
                     <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+
+                    <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                        <option value="">Non Playlist</option>
+                        {props.playlists.map((item) => {
+                            return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
+                        })}
+                    </select>
                 </Media.Body>
             </Media>
         </ListGroup.Item>
@@ -517,9 +547,6 @@ const VideoList = (props) => {
                                 return null
                             }
                         }))}
-                    { props.currentPlaylistId == '' &&
-                        <h3 className="m-auto">Select a playlist.</h3>
-                    }
                 </ListGroup>
                 {showPagenationItem()}
             </div>
