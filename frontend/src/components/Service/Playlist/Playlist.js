@@ -512,7 +512,7 @@ const VideoList = (props) => {
                     <TextField
                         disabled
                         className={classes.margin}
-                        value={props.currentPlaylistId && back_end_server + '/videolist/' + props.currentPlaylistId}
+                        value={props.currentPlaylistId && back_end_server + '/playlist/' + props.currentPlaylistId}
                         style={{width: "85%"}}
                         InputProps={{
                             startAdornment: (
@@ -522,7 +522,7 @@ const VideoList = (props) => {
                             ),
                         }}
                     />
-                    <Button onClick={() => {navigator.clipboard.writeText(back_end_server + '/videolist/' + props.currentPlaylistId)}}>Copy</Button>
+                    <Button onClick={() => {navigator.clipboard.writeText(back_end_server + '/playlist/' + props.currentPlaylistId)}}>Copy</Button>
                 </Paper>
                 <TextField
                     className={classes.margin}

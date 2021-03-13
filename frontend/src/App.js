@@ -78,7 +78,7 @@ function App() {
                 <NavDropdown.Item href="/execute_service">Weather</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_image">Upload Image</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_video">Upload Video</NavDropdown.Item>
-                <NavDropdown.Item href="/playlist">Manage Playlist</NavDropdown.Item>
+                <NavDropdown.Item href="/playlists">Manage Playlist</NavDropdown.Item>
                 <NavDropdown.Item href="/manage_ppt/list">Manage PowerPoint</NavDropdown.Item>
               </NavDropdown>
               <NavDropdown title={currentUser.username} id="collasible-nav-dropdown" alignRight >
@@ -115,8 +115,8 @@ function App() {
           <Route path="/manage_ppt/list" component={PPTFileList} />
           <Route path="/manage_ppt/edit_ppt/:ppt_id" component={EditPPT} />
           <Route path="/upload_video" component={UploadVideo} />
-          <Route path="/playlist" component={Playlist} />
-          <Route path="/videolist/:playlist_id" component={VideoList} />
+          <Route path="/playlists" component={Playlist} />
+          <Route path="/playlist/:playlist_id" component={VideoList} />
           <Route path="/user" component={BoardUser} />
           <Route path="/mod" component={BoardModerator} />
           <Route path="/admin" component={BoardAdmin} />
