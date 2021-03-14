@@ -37,7 +37,6 @@ import VideoService from '../../../services/video.service';
 
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
-import { Redirect } from 'react-router';
 
 const back_end_server = GlobalData.back_end_server_ip + ":3000";
 
@@ -242,7 +241,7 @@ export default () => {
 
     // Remove one video item
     const handleRemoveItem = (id) => {
-      PlaylistService.removePlaylist(id)
+        VideoService.removeVideo(id)
             .then(response => {
                 if (response.data.message === "success") {
                     let arr = [...videoInfos];

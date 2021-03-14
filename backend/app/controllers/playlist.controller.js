@@ -240,8 +240,6 @@ const getPublicPlaylist = (req, res)=>{
         }
     }).then(async user=>{
 
-        console.log(user.id)
-
         if(!user){
             return res.status(404).send({
                 message: "User Not Found."
@@ -258,7 +256,17 @@ const getPublicPlaylist = (req, res)=>{
                 playlist_id,
             }
         })
+        
+        let datalength = (!!one) ? Object.keys(one).length : 0;
 
+        console.log(datalength)
+        console.log(playlist_id)
+
+        if (datalength === 0) {
+            return res.status(200).send({
+                message: "cannot_access"
+            });
+        } 
         if (one.userId == user.id) {
             const items = await Video.findAll({
                 where: { 

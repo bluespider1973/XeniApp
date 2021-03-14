@@ -86,9 +86,11 @@ export default (props) => {
     }, [props])
 
     const getAllVideos = () => {
+     if (playlistId != null)
       PlaylistService.getPublicPlaylist(playlistId)
       .then(async response => {
-        if (response.data.message == 'cannot_access') {
+          console.log(response.data.length)
+        if (response.data.message == 'cannot_access' || response.data.length == 0) {
             history.push("/404");
         }
         if(response.data && response.data.length>0) {
