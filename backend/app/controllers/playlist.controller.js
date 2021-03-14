@@ -259,9 +259,6 @@ const getPublicPlaylist = (req, res)=>{
         
         let datalength = (!!one) ? Object.keys(one).length : 0;
 
-        console.log(datalength)
-        console.log(playlist_id)
-
         if (datalength === 0) {
             return res.status(200).send({
                 message: "cannot_access"
