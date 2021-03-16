@@ -25,7 +25,8 @@ import {
 
 import PlaylistService from '../../../services/playlist.service';
 import VideoService from '../../../services/video.service';
-import { LinearProgress } from '@material-ui/core';
+import { Collapse, LinearProgress } from '@material-ui/core';
+import MultipleSelect from './MutipleSelect';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -92,6 +93,17 @@ const VideoUpload = () => {
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
     const [playlists, setPlaylists] = useState([]);
+    
+    // for playlist multiple select
+    const [personName, setPersonName] = React.useState([]);
+
+    const handleChange = (event, i) => {
+        setPersonName(event.target.value);
+    };
+
+    useEffect(()=>{
+    })
+    // end
 
     useEffect(() => {
         setExpand()
@@ -550,6 +562,8 @@ const VideoUpload = () => {
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
                             onChangePlaylist={handlePlaylist}
+                            personName={personName}
+                            handleChange={handleChange}
                         />
                     }
                 </Col>
@@ -580,22 +594,31 @@ const VideoList = (props) => {
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
                     
-                    <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
-                    <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                    <Row>
+                        <Col>
+                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
+                            <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                        </Col>
+                        <Col>
+                            {props.playlists.length > 0 &&
+                                <MultipleSelect names={props.playlists} personName={props.personName} handleChange={props.handleChange} />
+                            }
+                        </Col>
+                    </Row>
 
-                    <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                    {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
                         <option value="">Non Playlist</option>
                         {props.playlists.map((item) => {
                             return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
                         })}
-                    </select>
+                    </select> */}
+                    
                 </Media.Body>
             </Media>
         </ListGroup.Item>
     );
 
     const showPagenationItem = () => {
-
         return (
             <Pagination
                 color="primary"

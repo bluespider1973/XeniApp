@@ -33,6 +33,7 @@ db.deletedFile = require('./deletedFile.model')(sequelize, Sequelize);
 db.ppt = require('./ppt.model')(sequelize, Sequelize);
 db.video = require('./video.model')(sequelize, Sequelize);
 db.playlist = require('./playlist.model')(sequelize, Sequelize);
+db.playlistVideo = require('./playlistVideo.model')(sequelize, Sequelize);
 
 db.role.belongsToMany(db.user, {
     through: "user_roles",
@@ -79,6 +80,22 @@ db.user.hasMany(db.playlist, {
     as: "Playlist"
 });
 db.playlist.belongsTo(db.user);
+
+// playlist_video
+db.video.hasMany(db.playlistVideo, {
+    as: "PlaylistVideo",
+    onDelete: 'cascade',
+    foreignKey: { allowNull: false },
+    hooks: true
+});
+db.playlist.hasMany(db.playlistVideo, {
+    as: "PlaylistVideo",
+    onDelete: 'cascade',
+    foreignKey: { allowNull: false },
+    hooks: true
+})
+db.playlistVideo.belongsTo(db.video);
+db.playlistVideo.belongsTo(db.playlist);
 
 db.ROLES = ["user", "admin", "moderator"];
 

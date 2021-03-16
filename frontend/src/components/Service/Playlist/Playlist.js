@@ -80,7 +80,7 @@ const MyVerticallyCenteredModal = (props) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <ReactPlayer url={props.playUrl} playing={true} width='100%' />
+                <ReactPlayer url={props.playUrl} playing={true} width='100%'  controls={true} />
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
