@@ -42,10 +42,6 @@ const getVideoId = (url) => {
 
 const MyVerticallyCenteredModal = (props) => {
 
-    const getCurrentVideoNumber = () => {
-        return props.videoData.findIndex(item => item.id == props.videoId) + 1
-    }
-    
     return (
         <Modal
             {...props}
@@ -62,9 +58,9 @@ const MyVerticallyCenteredModal = (props) => {
                 <ReactPlayer url={props.playUrl} playing={true} width='100%' controls={true} />
             </Modal.Body>
             <Modal.Footer>
-                <p style={{marginRight: '5%'}}>{Object.keys(props.videoData).length} / {getCurrentVideoNumber()}</p>
-                {/* <Button variant="primary" onClick={props.onHide}>Previous</Button>
-                <Button variant="primary" onClick={props.onHide}>Next</Button> */}
+                {/* <p style={{marginRight: '5%'}}>{props.currentVideoNumber} of {Object.keys(props.videoData).length}</p> */}
+                <Button variant="primary" onClick={props.onPreviousVideo}>Previous</Button>
+                <Button style={{marginRight: '30px'}} variant="primary" onClick={props.onNextVideo}>Next</Button>
                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
             </Modal.Footer>
         </Modal>
@@ -83,6 +79,7 @@ export default (props) => {
     const [metaTitle, setMetaTitle] = useState(null);
     const [videoId, setVideoId] = useState(null);
     const [playlistId, setPlaylistId] = useState(null);
+    const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
     
     let history = useHistory();
 
@@ -151,6 +148,34 @@ export default (props) => {
         setVideoId(videoId);
     }
 
+    const onNextVideo = () => {
+        const index = videoData.findIndex(item => item.id == videoId);
+        if (index >= videoData.length - 1) {
+            return;
+        }
+        const nextUrl = videoData[index + 1].video_id;
+        setVideoId(videoData[index + 1].id);
+        setPlayUrl(nextUrl);
+        setMetaTitle(videoData[index + 1].meta_title)
+        setCurrentVideoNumber(getCurrentVideoNumber() + 1)
+    }
+
+    const onPreviousVideo = () => {
+        const index = videoData.findIndex(item => item.id == videoId);
+        if (index <= 0) {
+            return;
+        }
+        const prevUrl = videoData[index - 1].video_id;
+        setVideoId(videoData[index - 1].id);
+        setPlayUrl(prevUrl);
+        setMetaTitle(videoData[index - 1].meta_title)
+        setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+    }
+
+    const getCurrentVideoNumber = () => {
+        return videoData.findIndex(item => item.id == videoId) + 1
+    }
+
     return (
         <>
             {videoInfos &&
@@ -171,6 +196,9 @@ export default (props) => {
                 metaTitle={metaTitle}
                 videoData={videoData}
                 videoId={videoId}
+                onPreviousVideo={onPreviousVideo}
+                onNextVideo={onNextVideo}
+                currentVideoNumber={currentVideoNumber}
             />
         </>
     );
