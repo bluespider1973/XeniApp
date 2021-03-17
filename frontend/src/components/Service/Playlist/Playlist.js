@@ -22,6 +22,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
 import GlobalData from '../../../tools/GlobalData';
+import MultipleSelect from './MutipleSelect';
 
 import {
     Row,
@@ -290,7 +291,17 @@ export default () => {
         .then(async response => {
             if(response.data && response.data.length>0) {
 
-                setVideoData(response.data);
+                const res = response.data;
+                    
+                for (const key in res) {
+                    const videoId = res[key].id;
+                    const result = await VideoService.getPlaylistIds(videoId);
+                    res[key].arr = result.data.playlists;
+                }
+
+                setVideoData(res)
+
+                // setVideoData(response.data);
                 setVideoInfos(response.data);
                 
                 const total = Math.ceil(response.data.length / itemsPerPage);
@@ -474,15 +485,24 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="success" size="sm" className="mr-3" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title)}>Play</Button>
-                    <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
-
-                    <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
-                        <option value="">Non Playlist</option>
-                        {props.playlists.map((item) => {
-                            return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
-                        })}
-                    </select>
+                   
+                    <Row>
+                        <Col>
+                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title)}>Play</Button>
+                            <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                        </Col>
+                        <Col>
+                            {props.playlists.length > 0 &&
+                                <MultipleSelect names={props.playlists} videoId={data.id} a={data.arr} />
+                            }
+                            {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                                <option value="">Non Playlist</option>
+                                {props.playlists.map((item) => {
+                                    return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
+                                })}
+                            </select> */}
+                        </Col>
+                    </Row>
                 </Media.Body>
             </Media>
         </ListGroup.Item>

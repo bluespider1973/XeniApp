@@ -7,6 +7,7 @@ const {Generate, sendSimpleMail} = require('../lib');
 
 const User = db.user;
 const Playlist = db.playlist;
+const PlaylistVideo = db.playlistVideo;
 const Video = db.video;
 
 var global_data = require('../tools/GlobalData');
@@ -208,13 +209,19 @@ const getPlaylist = (req, res)=>{
             });
         }
 
-        const items = await Video.findAll({
+        const playlist = await Playlist.findOne({
+            include: [{model: PlaylistVideo, as: 'PlaylistVideo', include: [Video] }],
             where: { playlist_id }
+        })
+
+        var video_arr = [];
+        playlist.PlaylistVideo.forEach(item => {
+            video_arr.push(item.video);
         })
 
         let fileInfos = [];
 
-		await items.forEach(video => {
+		await video_arr.forEach(video => {
             fileInfos.push({
                 id: video.id,
                 video_id: video.video_id,
@@ -231,6 +238,7 @@ const getPlaylist = (req, res)=>{
     })
 }
 
+
 const getPublicPlaylist = (req, res)=>{
     const {user_id, access_key, playlist_id} = req.query;
 
@@ -239,7 +247,6 @@ const getPublicPlaylist = (req, res)=>{
             user_id: user_id
         }
     }).then(async user=>{
-
         if(!user){
             return res.status(404).send({
                 message: "User Not Found."
@@ -251,29 +258,20 @@ const getPublicPlaylist = (req, res)=>{
             });
         }
 
-        const one = await Playlist.findOne({
-            where: {
-                playlist_id,
-            }
+        const playlist = await Playlist.findOne({
+            include: [{model: PlaylistVideo, as: 'PlaylistVideo', include: [Video] }],
+            where: { playlist_id }
         })
-        
-        let datalength = (!!one) ? Object.keys(one).length : 0;
 
-        if (datalength === 0) {
-            return res.status(200).send({
-                message: "cannot_access"
-            });
-        } 
-        if (one.userId == user.id) {
-            const items = await Video.findAll({
-                where: { 
-                    playlist_id,
-                }
+        if (playlist.userId == user.id) {
+            var video_arr = [];
+            playlist.PlaylistVideo.forEach(item => {
+                video_arr.push(item.video);
             })
-    
+
             let fileInfos = [];
-    
-            await items.forEach(video => {
+
+            await video_arr.forEach(video => {
                 fileInfos.push({
                     id: video.id,
                     video_id: video.video_id,
@@ -281,20 +279,21 @@ const getPublicPlaylist = (req, res)=>{
                     meta_image: video.meta_image,
                     meta_keyword: video.meta_keyword,
                     meta_description: video.meta_description, 
+                    playlist_id: video.playlist_id,
                     dateTime: video.createdAt,
                 });
             });
+
             res.status(200).send(fileInfos);
-        } else if (one.playlist_status == 1) {
-            const items = await Video.findAll({
-                where: { 
-                    playlist_id,
-                }
+        } else if (playlist.playlist_status == 1) {
+            var video_arr = [];
+            playlist.PlaylistVideo.forEach(item => {
+                video_arr.push(item.video);
             })
-    
+
             let fileInfos = [];
-    
-            await items.forEach(video => {
+
+            await video_arr.forEach(video => {
                 fileInfos.push({
                     id: video.id,
                     video_id: video.video_id,
@@ -302,9 +301,11 @@ const getPublicPlaylist = (req, res)=>{
                     meta_image: video.meta_image,
                     meta_keyword: video.meta_keyword,
                     meta_description: video.meta_description, 
+                    playlist_id: video.playlist_id,
                     dateTime: video.createdAt,
                 });
             });
+
             res.status(200).send(fileInfos);
         } else {
             res.status(200).send({

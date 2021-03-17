@@ -596,7 +596,6 @@ const VideoList = (props) => {
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
-                            {console.log(data.arr)}
                             {props.playlists.length > 0 &&
                                 <MultipleSelect names={props.playlists} videoId={data.id} a={data.arr} />
                             }
