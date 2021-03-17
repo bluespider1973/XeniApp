@@ -100,37 +100,20 @@ const addPlaylistIds = async(req, res)=>{
                     message: "Forbidden."
                 })
             }
-            console.log('++++++++++++++++++++++++++')
 
-            const aa = await PlaylistVideo.findOne({
+            await PlaylistVideo.destroy({
                 where: {
                     videoId: video_id
                 }
             })
-
-            if(aa)
-                aa.destroy()
-
-            console.log('-------------')
-
+             
             playlist_ids.forEach( async item => {
-                const playlistVideo = await PlaylistVideo.create({
+                await PlaylistVideo.create({
                     videoId: video_id,
                     playlistId: item,
+                    userId: user.id
                 });
-                user.addPlaylistVideo(playlistVideo).then(async result=>{
-                    res.status(200).send({
-                        message: "success",
-                    });
-                }).catch(err=>{
-                    res.status(500).send({
-                        message: err.message
-                    })
-                })
             })
-            
-
-
         }).catch(err=>{
             res.status(500).send({
                 message: err.message
@@ -142,6 +125,56 @@ const addPlaylistIds = async(req, res)=>{
         })
     }
 }
+
+
+const getPlaylistIds = async(req, res)=>{
+    const {user_id, access_key, video_id} = req.query;
+
+    try{
+        User.findOne({
+            where: {
+                user_id: user_id
+            }
+        }).then(async user=>{
+            if(!user){
+                return res.status(404).send({
+                    message: "Invalid User Id."
+                });
+            }
+            if(user.access_key !== access_key){
+                return res.status(403).send({
+                    message: "Forbidden."
+                })
+            }
+
+            const playlists = await PlaylistVideo.findAll({
+                attributes: ['playlistId'],
+                where: {
+                    videoId: video_id
+                }
+            })
+
+            let arr = [];
+            playlists.forEach(element => {
+                arr.push(element.playlistId)
+            });
+            res.status(200).send({
+                message: 'success',
+                playlists: arr,
+            })
+             
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message
+            });
+        })
+    } catch(err){
+        res.status(500).send({
+            message: err
+        })
+    }
+}
+
 
 const removeVideo = (req, res) =>{
     const {user_id, user_key} = req.query;
@@ -272,6 +305,7 @@ const getAllVideoList = (req, res)=>{
 module.exports = {
     uploadVideo,
     addPlaylistIds,
+    getPlaylistIds,
     removeVideo,
     changeVideoGroup,
     getAllVideoList,

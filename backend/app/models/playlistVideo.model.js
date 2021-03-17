@@ -9,8 +9,6 @@ module.exports = (sequelize, Sequelize) => {
         },
         createdAt: {
             type: Sequelize.DATE,
-            onDelete: 'cascade',
-            hooks:true,
             get: function() {
                 let date = this.getDataValue('createdAt')
         

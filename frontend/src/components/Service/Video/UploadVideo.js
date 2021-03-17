@@ -193,7 +193,15 @@ const VideoUpload = () => {
         VideoService.getAllVideoList()
             .then(async response => {
                 if(response.data && response.data.length>0) {
-                    setVideoData(response.data)
+                    const res = response.data;
+                    
+                    for (const key in res) {
+                        const videoId = res[key].id;
+                        const result = await VideoService.getPlaylistIds(videoId);
+                        res[key].arr = result.data.playlists;
+                    }
+
+                    setVideoData(res)
                     setTree(response.data)
                     
                     ///////
@@ -588,15 +596,16 @@ const VideoList = (props) => {
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
-                            {/* {props.playlists.length > 0 &&
-                                <MultipleSelect names={props.playlists} videoId={data.id}/>
-                            } */}
-                            <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                            {console.log(data.arr)}
+                            {props.playlists.length > 0 &&
+                                <MultipleSelect names={props.playlists} videoId={data.id} a={data.arr} />
+                            }
+                            {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
                                 <option value="">Non Playlist</option>
                                 {props.playlists.map((item) => {
                                     return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
                                 })}
-                            </select>
+                            </select> */}
                         </Col>
                     </Row>
 

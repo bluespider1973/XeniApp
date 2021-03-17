@@ -48,20 +48,14 @@ function getStyles(name, personName, theme) {
 }
 
 export default function MultipleSelect(props) {
-  const [myPlayLists, setMyPlayLists] = useState([]);
+  const [myPlayLists, setMyPlayLists] = useState(props.a);
 
   const classes = useStyles();
   const theme = useTheme();
-  
-  useEffect(() => {
-    
-  })
 
   const handleChange = (e) => {
     setMyPlayLists(e.target.value)
-    console.log(e.target.value)
 
-    VideoService.addPlaylistIds(props.videoId, e.target.value)
     // .then(response => {
     //     setMessage(response.data.message);
     //     setAlertVisible(true)
@@ -79,6 +73,10 @@ export default function MultipleSelect(props) {
 
   }
 
+  const savePlaylist = () => {
+    VideoService.addPlaylistIds(props.videoId, myPlayLists)
+  }
+
   return (
     <div>
       <FormControl className={classes.formControl}>
@@ -88,6 +86,7 @@ export default function MultipleSelect(props) {
           multiple
           value={myPlayLists}
           onChange={handleChange}
+          onClose={savePlaylist}
           input={<Input />}
           MenuProps={MenuProps}
         >

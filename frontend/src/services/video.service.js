@@ -17,6 +17,11 @@ class VideoService {
     return axios.post(`${VIDEO_API_URL}addPlaylistIds?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`, playlist_ids);
   }
 
+  getPlaylistIds(video_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${VIDEO_API_URL}getPlaylistIds?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`);
+  }
+
   removeVideo(id) {
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${VIDEO_API_URL}removeVideo/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
