@@ -42,6 +42,10 @@ const getVideoId = (url) => {
 
 const MyVerticallyCenteredModal = (props) => {
 
+    const getCurrentVideoNumber = () => {
+        return props.videoData.findIndex(item => item.id == props.videoId) + 1
+    }
+    
     return (
         <Modal
             {...props}
@@ -51,13 +55,16 @@ const MyVerticallyCenteredModal = (props) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Video window
+                    {props.metaTitle}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <ReactPlayer url={props.playUrl} playing={true} width='100%' />
+                <ReactPlayer url={props.playUrl} playing={true} width='100%' controls={true} />
             </Modal.Body>
             <Modal.Footer>
+                <p style={{marginRight: '5%'}}>{Object.keys(props.videoData).length} / {getCurrentVideoNumber()}</p>
+                {/* <Button variant="primary" onClick={props.onHide}>Previous</Button>
+                <Button variant="primary" onClick={props.onHide}>Next</Button> */}
                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
             </Modal.Footer>
         </Modal>
@@ -73,7 +80,10 @@ export default (props) => {
     const [videoInfos, setVideoInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
+    const [metaTitle, setMetaTitle] = useState(null);
+    const [videoId, setVideoId] = useState(null);
     const [playlistId, setPlaylistId] = useState(null);
+    
     let history = useHistory();
 
     useEffect(() => {
@@ -134,9 +144,11 @@ export default (props) => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url) => {
+    const handlePlayVideo = (video_url, meta_title, videoId) => {
         setModalShow(true);
         setPlayUrl(video_url);
+        setMetaTitle(meta_title);
+        setVideoId(videoId);
     }
 
     return (
@@ -156,6 +168,9 @@ export default (props) => {
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
+                metaTitle={metaTitle}
+                videoData={videoData}
+                videoId={videoId}
             />
         </>
     );
@@ -177,8 +192,8 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="primary" size="sm" style={{padding: '5px 20px'}} className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>
-                      Play Video
+                    <Button variant="primary" size="sm" style={{padding: '5px 20px'}} className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.id)}>
+                        Play Video
                     </Button>
                 </Media.Body>
             </Media>

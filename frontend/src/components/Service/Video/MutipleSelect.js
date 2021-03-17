@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import { StepLabel } from '@material-ui/core';
+
+import VideoService from '../../../services/video.service';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -45,9 +48,37 @@ function getStyles(name, personName, theme) {
 }
 
 export default function MultipleSelect(props) {
+  const [myPlayLists, setMyPlayLists] = useState([]);
+
   const classes = useStyles();
   const theme = useTheme();
   
+  useEffect(() => {
+    
+  })
+
+  const handleChange = (e) => {
+    setMyPlayLists(e.target.value)
+    console.log(e.target.value)
+
+    VideoService.addPlaylistIds(props.videoId, e.target.value)
+    // .then(response => {
+    //     setMessage(response.data.message);
+    //     setAlertVisible(true)
+    //     setTimeout(() => {
+    //         setAlertVisible(false)
+    //     }, 2000)
+
+    //     setProgressVisible(false);
+
+    //     if (response.data.message === 'success') {
+    //         getAllVideos();
+    //         setVideoUrl('');
+    //     }
+    // })
+
+  }
+
   return (
     <div>
       <FormControl className={classes.formControl}>
@@ -55,13 +86,13 @@ export default function MultipleSelect(props) {
           labelId="demo-mutiple-name-label"
           id="demo-mutiple-name"
           multiple
-          value={props.personName}
-          onChange={props.handleChange}
+          value={myPlayLists}
+          onChange={handleChange}
           input={<Input />}
           MenuProps={MenuProps}
         >
           {props.names.map((name) => (
-            <MenuItem key={name.id} value={name.id} style={getStyles(name.playlist_title, props.personName, theme)}>
+            <MenuItem key={name.id} value={name.id}>
               {name.playlist_title}
             </MenuItem>
           ))}

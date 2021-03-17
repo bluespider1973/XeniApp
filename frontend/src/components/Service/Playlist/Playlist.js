@@ -76,7 +76,7 @@ const MyVerticallyCenteredModal = (props) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Video window
+                    {props.metaTitle}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
@@ -161,6 +161,7 @@ export default () => {
     const [modalShow, setModalShow] = useState(false);
     const [settingShow, setSettingShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
+    const [metaTitle, setMetaTitle] = useState(null);
     const [playlistTitle, setPlaylistTitle] = useState('');
     const [playlistStatus, setPlaylistStatus] = useState(1);
     const [currentPlaylistId, setCurrentPlaylistId] = useState('');
@@ -260,9 +261,10 @@ export default () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url) => {
+    const handlePlayVideo = (video_url, meta_title) => {
         setModalShow(true);
         setPlayUrl(video_url);
+        setMetaTitle(meta_title);
     }
 
     // playlist
@@ -440,6 +442,7 @@ export default () => {
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
+                metaTitle={metaTitle}
             />
             <SettingDialog
                 show={settingShow}
@@ -471,7 +474,7 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="success" size="sm" className="mr-3" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
+                    <Button variant="success" size="sm" className="mr-3" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title)}>Play</Button>
                     <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
 
                     <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>

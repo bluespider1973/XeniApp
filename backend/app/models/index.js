@@ -96,6 +96,7 @@ db.playlist.hasMany(db.playlistVideo, {
 })
 db.playlistVideo.belongsTo(db.video);
 db.playlistVideo.belongsTo(db.playlist);
+db.playlistVideo.belongsTo(db.user);
 
 db.ROLES = ["user", "admin", "moderator"];
 

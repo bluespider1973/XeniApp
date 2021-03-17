@@ -51,9 +51,7 @@ const getVideoId = (url) => {
     return url.split("?v=")[1];
 } 
 
-
 const MyVerticallyCenteredModal = (props) => {
-
     return (
         <Modal
             {...props}
@@ -63,11 +61,11 @@ const MyVerticallyCenteredModal = (props) => {
         >
             <Modal.Header closeButton>
                 <Modal.Title id="contained-modal-title-vcenter">
-                    Video window
+                    {props.metaTitle}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <ReactPlayer url={props.playUrl} playing={true} width='100%' />
+                <ReactPlayer url={props.playUrl} playing={true} width='100%' controls={true}/>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={props.onHide}>Close</Button>
@@ -92,19 +90,9 @@ const VideoUpload = () => {
     const [videoInfos, setVideoInfos] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
+    const [metaTitle, setMetaTitle] = useState(null);
     const [playlists, setPlaylists] = useState([]);
     
-    // for playlist multiple select
-    const [personName, setPersonName] = React.useState([]);
-
-    const handleChange = (event, i) => {
-        setPersonName(event.target.value);
-    };
-
-    useEffect(()=>{
-    })
-    // end
-
     useEffect(() => {
         setExpand()
     }, [])
@@ -472,9 +460,10 @@ const VideoUpload = () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url) => {
+    const handlePlayVideo = (video_url, meta_title) => {
         setModalShow(true);
         setPlayUrl(video_url);
+        setMetaTitle(meta_title);
     }
 
 
@@ -562,8 +551,6 @@ const VideoUpload = () => {
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
                             onChangePlaylist={handlePlaylist}
-                            personName={personName}
-                            handleChange={handleChange}
                         />
                     }
                 </Col>
@@ -572,6 +559,7 @@ const VideoUpload = () => {
                 show={modalShow}
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
+                metaTitle={metaTitle}
             />
         </>
     );
@@ -596,22 +584,23 @@ const VideoList = (props) => {
                     
                     <Row>
                         <Col>
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id)}>Play</Button>
+                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title)}>Play</Button>
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
-                            {props.playlists.length > 0 &&
-                                <MultipleSelect names={props.playlists} personName={props.personName} handleChange={props.handleChange} />
-                            }
+                            {/* {props.playlists.length > 0 &&
+                                <MultipleSelect names={props.playlists} videoId={data.id}/>
+                            } */}
+                            <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
+                                <option value="">Non Playlist</option>
+                                {props.playlists.map((item) => {
+                                    return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
+                                })}
+                            </select>
                         </Col>
                     </Row>
 
-                    {/* <select  className="mr-2 float-right" onChange={(e) => props.onChangePlaylist(e, data.id)}>
-                        <option value="">Non Playlist</option>
-                        {props.playlists.map((item) => {
-                            return <option selected={data.playlist_id == item.playlist_id}>{item.playlist_title}</option>;
-                        })}
-                    </select> */}
+                    
                     
                 </Media.Body>
             </Media>

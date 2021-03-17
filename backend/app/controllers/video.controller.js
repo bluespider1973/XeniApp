@@ -10,6 +10,7 @@ const ImageProcessing = require('../lib/imageProcessing');
 const User = db.user;
 const TokenHistory = db.tokenHistory;
 const Video = db.video;
+const PlaylistVideo = db.playlistVideo;
 const DeletedFile = db.deletedFile;
 
 var global_data = require('../tools/GlobalData');
@@ -65,6 +66,70 @@ const uploadVideo = async(req, res)=>{
                     message: err.message
                 })
             })
+
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message
+            });
+        })
+    } catch(err){
+        res.status(500).send({
+            message: err
+        })
+    }
+}
+
+
+const addPlaylistIds = async(req, res)=>{
+    const {user_id, access_key, video_id} = req.query;
+    const playlist_ids = req.body;
+
+    try{
+        User.findOne({
+            where: {
+                user_id: user_id
+            }
+        }).then(async user=>{
+            if(!user){
+                return res.status(404).send({
+                    message: "Invalid User Id."
+                });
+            }
+            if(user.access_key !== access_key){
+                return res.status(403).send({
+                    message: "Forbidden."
+                })
+            }
+            console.log('++++++++++++++++++++++++++')
+
+            const aa = await PlaylistVideo.findOne({
+                where: {
+                    videoId: video_id
+                }
+            })
+
+            if(aa)
+                aa.destroy()
+
+            console.log('-------------')
+
+            playlist_ids.forEach( async item => {
+                const playlistVideo = await PlaylistVideo.create({
+                    videoId: video_id,
+                    playlistId: item,
+                });
+                user.addPlaylistVideo(playlistVideo).then(async result=>{
+                    res.status(200).send({
+                        message: "success",
+                    });
+                }).catch(err=>{
+                    res.status(500).send({
+                        message: err.message
+                    })
+                })
+            })
+            
+
 
         }).catch(err=>{
             res.status(500).send({
@@ -206,6 +271,7 @@ const getAllVideoList = (req, res)=>{
 
 module.exports = {
     uploadVideo,
+    addPlaylistIds,
     removeVideo,
     changeVideoGroup,
     getAllVideoList,
