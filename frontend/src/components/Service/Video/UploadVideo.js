@@ -651,9 +651,11 @@ const VideoList = (props) => {
             <Media>
                 <Image thumbnail src={data.meta_image} className="mr-3" />
                 <Media.Body>
-                    <h5><span>{data.manual_title ? data.manual_title : data.meta_title}</span></h5>
+                    <h5><span>{data.meta_title}</span></h5>
+                    <h5><span style={{color: 'green'}}>{data.manual_title ? data.manual_title : 'No manual title'}</span></h5>
                     <p style={{marginBottom: "0px"}}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
-                    <p style={{marginBottom: "2px"}}><span>{data.manual_description ? data.manual_description : data.meta_description}</span></p>
+                    <p style={{marginBottom: "2px"}}><span>{data.meta_description}</span></p>
+                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description ? data.manual_description : 'No manual description'}</span></p>
                     {data.meta_keyword && (
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}

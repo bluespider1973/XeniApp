@@ -226,7 +226,7 @@ const removeVideo = (req, res) =>{
 }
 
 
-const setManualInfo = (req, res) =>{
+const setManualInfo = (req, res) => {
     const {user_id, user_key, manual_title, manual_description} = req.query;
     const id = req.params.id;
 

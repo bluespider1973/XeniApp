@@ -24,6 +24,7 @@ import FolderSharedIcon from '@material-ui/icons/FolderShared';
 import GlobalData from '../../../tools/GlobalData';
 import MultipleSelect from './MutipleSelect';
 import MyVerticallyCenteredModal from './MyVerticallyCenteredModal';
+import EditDialog from '../Video/EditDialog';
 
 import {
     Row,
@@ -34,9 +35,8 @@ import {
     ListGroup,
     Media,
 } from 'react-bootstrap';
+
 import VideoService from '../../../services/video.service';
-
-
 import PlaylistService from '../../../services/playlist.service';
 import { LinearProgress, Paper } from '@material-ui/core';
 
@@ -66,7 +66,6 @@ const getVideoId = (url) => {
 } 
 
 const SettingDialog = (props) => {
-
     const classes = useStyles();
 
     return (
@@ -93,8 +92,8 @@ const SettingDialog = (props) => {
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
-                                <InputIcon />
-                                </InputAdornment>
+                                        <InputIcon />
+                                    </InputAdornment>
                                 ),
                             }}
                         />
@@ -149,6 +148,9 @@ export default () => {
     const [videoId, setVideoId] = useState(null);
     const [playlistId, setPlaylistId] = useState(null);
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
+    const [editShow, setEditShow] = useState(false);
+    const [manualTitle, setManualTitle] = useState(undefined);
+    const [manualDescription, setManualDescription] = useState(undefined);
 
     React.useEffect(() => {
         getAllPlaylists();
@@ -164,8 +166,6 @@ export default () => {
                 }
             })
     }
-
-
 
     // Add playlist
     const upload = () => {
@@ -371,6 +371,16 @@ export default () => {
     }
 
 
+    // edit save
+    const onSave = () => {
+        setEditShow(false);
+        VideoService.setManualInfo(videoId, manualTitle, manualDescription);
+        const index = videoData.findIndex(item => item.id == videoId);
+        videoData[index].manual_title = manualTitle;
+        videoData[index].manual_description = manualDescription;
+    }
+
+
     const classes = useStyles();
 
     const renderTree = (nodes) => {
@@ -475,6 +485,10 @@ export default () => {
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
                             onChangePlaylist={handlePlaylist}
+                            setEditShow={setEditShow}
+                            setManualTitle={setManualTitle}
+                            setManualDescription={setManualDescription}
+                            setVideoId={setVideoId}
                         />
                     }
                 </Col>
@@ -503,6 +517,15 @@ export default () => {
                 currentPlaylistTitle={currentPlaylistTitle}
                 currentPlaylistStatus={currentPlaylistStatus}
             />
+            <EditDialog
+                show={editShow}
+                onHide={() => setEditShow(false)}
+                manualTitle={manualTitle}
+                manualDescription={manualDescription}
+                setManualTitle={setManualTitle}
+                setManualDescription={setManualDescription}
+                onSave={onSave}
+            />
         </>
     );
 }
@@ -517,8 +540,10 @@ const VideoList = (props) => {
                 <Image thumbnail src={data.meta_image} className="mr-3" />
                 <Media.Body>
                     <h5><span>{data.meta_title}</span></h5>
+                    <h5><span style={{color: 'green'}}>{data.manual_title ? data.manual_title : 'No manual title'}</span></h5>
                     <p style={{marginBottom: "0px"}}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
                     <p style={{marginBottom: "2px"}}><span>{data.meta_description}</span></p>
+                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description ? data.manual_description : 'No manual description'}</span></p>
                     {data.meta_keyword && (
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
@@ -527,6 +552,16 @@ const VideoList = (props) => {
                     <Row>
                         <Col>
                             <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.meta_description, data.id)}>Play</Button>
+                            <Button variant="info" size="sm" className="mr-2" 
+                                onClick={() => {
+                                    props.setManualTitle(data.manual_title);
+                                    props.setManualDescription(data.manual_description);
+                                    props.setEditShow(true);
+                                    props.setVideoId(data.id);
+                                }}
+                            >
+                                Edit
+                            </Button>
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
