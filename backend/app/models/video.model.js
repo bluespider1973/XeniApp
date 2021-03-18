@@ -13,6 +13,9 @@ module.exports = (sequelize, Sequelize) => {
         meta_title: {
             type: Sequelize.STRING,
         },
+        manual_title: {
+            type: Sequelize.STRING,
+        },
         meta_image: {
             type: Sequelize.STRING,
         },
@@ -21,6 +24,9 @@ module.exports = (sequelize, Sequelize) => {
         },
         meta_description: {
             type: Sequelize.STRING
+        },
+        manual_description: {
+            type: Sequelize.STRING,
         },
         meta_restriction_age: {
             type: Sequelize.STRING

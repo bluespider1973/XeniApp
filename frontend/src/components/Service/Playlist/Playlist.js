@@ -364,6 +364,7 @@ export default () => {
 
     const itemClick = (video_id, videoId) => {
         setPlayUrl(video_id);
+        setVideoId(videoId);
         setMetaTitle(videoData.find(item=>item.id == videoId).meta_title);
         setMetaDescription(videoData.find(item=>item.id == videoId).meta_description);
     }

@@ -40,15 +40,14 @@ const uploadVideo = async(req, res)=>{
             let meta_title, meta_image, meta_keyword, meta_description, meta_restriction_age;
             await getMetadata(video_id).then(( metadata) => {
                 try{
-					console.log( metadata);
 					meta_title = metadata.title;
 					meta_image = metadata.image;
 					meta_keyword = metadata.keyword;
 					meta_description = metadata.description;
 					meta_restriction_age = metadata['og:restrictions:age'];
-					console.log( "og:restrictions:age=[" + meta_restriction_age + "]");
+					// console.log( "og:restrictions:age=[" + meta_restriction_age + "]");
 				}catch( err_parse){
-					console.log( "parse eror of metadata=" + err_parse);
+					// console.log( "parse eror of metadata=" + err_parse);
 				}
             },(error) => {
                 res.status(200).send({
@@ -298,9 +297,11 @@ const getAllVideoList = (req, res)=>{
                 id: video.id,
                 video_id: video.video_id,
                 meta_title: video.meta_title,
+                manual_title: video.manual_title,
                 meta_image: video.meta_image,
                 meta_keyword: video.meta_keyword,
                 meta_description: video.meta_description,
+                manual_description: video.manual_description,
                 playlist_id: video.playlist_id,
                 id_counter: list_counter++,
                 dateTime: video.createdAt,
