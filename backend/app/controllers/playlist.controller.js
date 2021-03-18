@@ -74,21 +74,21 @@ const removePlaylist = (req, res) =>{
         }
     }).then(async (user)=>{
         if(!user){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "User Not Found."
             });
         }
         if(user.access_key != user_key){
-            return res.status(400).send({                
+            return res.status(400).send({
                 message: "Invalid User Key."
             });
         }
-        
+
         const playlist = await Playlist.findOne({
             where: { playlist_id: id }
         });
         if(!playlist){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "Invalid Image Id."
             });
         }
@@ -117,21 +117,21 @@ const changePlaylist = (req, res) =>{
         }
     }).then(async (user)=>{
         if(!user){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "User Not Found."
             });
         }
         if(user.access_key != user_key){
-            return res.status(400).send({                
+            return res.status(400).send({
                 message: "Invalid User Key."
             });
         }
-        
+
         const playlist = await Playlist.findOne({
             where: { playlist_id: id }
         });
         if(!playlist){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "Invalid Image Id."
             });
         }
@@ -174,9 +174,9 @@ const getAllPlaylist = (req, res)=>{
 
         const playlists = await user.getPlaylist();
 
-        
+
         let fileInfos = [];
-        
+
 		await playlists.forEach(playlist => {
             fileInfos.push({
                 id: playlist.id,
@@ -228,7 +228,8 @@ const getPlaylist = (req, res)=>{
                 meta_title: video.meta_title,
                 meta_image: video.meta_image,
                 meta_keyword: video.meta_keyword,
-                meta_description: video.meta_description, 
+                meta_description: video.meta_description,
+                meta_restriction_age: video.meta_restriction_age,
                 playlist_id: video.playlist_id,
                 dateTime: video.createdAt,
             });
@@ -263,6 +264,16 @@ const getPublicPlaylist = (req, res)=>{
             where: { playlist_id }
         })
 
+
+        let datalength = (!!playlist) ? Object.keys(playlist).length : 0;
+
+        if (datalength === 0) {
+            return res.status(200).send({
+                message: "cannot_access"
+            });
+        }
+
+
         if (playlist.userId == user.id) {
             var video_arr = [];
             playlist.PlaylistVideo.forEach(item => {
@@ -278,7 +289,8 @@ const getPublicPlaylist = (req, res)=>{
                     meta_title: video.meta_title,
                     meta_image: video.meta_image,
                     meta_keyword: video.meta_keyword,
-                    meta_description: video.meta_description, 
+                    meta_description: video.meta_description,
+                	meta_restriction_age: video.meta_restriction_age,
                     playlist_id: video.playlist_id,
                     dateTime: video.createdAt,
                 });
@@ -300,7 +312,8 @@ const getPublicPlaylist = (req, res)=>{
                     meta_title: video.meta_title,
                     meta_image: video.meta_image,
                     meta_keyword: video.meta_keyword,
-                    meta_description: video.meta_description, 
+                    meta_description: video.meta_description,
+                	meta_restriction_age: video.meta_restriction_age,
                     playlist_id: video.playlist_id,
                     dateTime: video.createdAt,
                 });

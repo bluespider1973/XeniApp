@@ -23,6 +23,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import FolderSharedIcon from '@material-ui/icons/FolderShared';
 import GlobalData from '../../../tools/GlobalData';
 import MultipleSelect from './MutipleSelect';
+import MyVerticallyCenteredModal from './MyVerticallyCenteredModal';
 
 import {
     Row,
@@ -63,32 +64,6 @@ const useStyles = makeStyles((theme) => ({
 const getVideoId = (url) => {
     return url.split("?v=")[1];
 } 
-
-
-
-const MyVerticallyCenteredModal = (props) => {
-
-    return (
-        <Modal
-            {...props}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
-            <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    {props.metaTitle}
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <ReactPlayer url={props.playUrl} playing={true} width='100%'  controls={true} />
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={props.onHide}>Close</Button>
-            </Modal.Footer>
-        </Modal>
-    );
-}
 
 const SettingDialog = (props) => {
 
@@ -163,6 +138,7 @@ export default () => {
     const [settingShow, setSettingShow] = useState(false);
     const [playUrl, setPlayUrl] = useState(null);
     const [metaTitle, setMetaTitle] = useState(null);
+    const [metaDescription, setMetaDescription] = useState(null);
     const [playlistTitle, setPlaylistTitle] = useState('');
     const [playlistStatus, setPlaylistStatus] = useState(1);
     const [currentPlaylistId, setCurrentPlaylistId] = useState('');
@@ -170,6 +146,9 @@ export default () => {
     const [currentPlaylistTitle, setCurrentPlaylistTitle] = useState('');
     const [currentPlaylistStatus, setCurrentPlaylistStatus] = useState('');
     const [playlists, setPlaylists] = useState([]);
+    const [videoId, setVideoId] = useState(null);
+    const [playlistId, setPlaylistId] = useState(null);
+    const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
 
     React.useEffect(() => {
         getAllPlaylists();
@@ -219,8 +198,6 @@ export default () => {
             }
         });
 
-        console.log(videoInfos)
-
         if (keyword == "") {
             setVideoInfos(videoData);
         } else {
@@ -262,10 +239,11 @@ export default () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url, meta_title) => {
+    const handlePlayVideo = (video_url, meta_title, meta_description) => {
         setModalShow(true);
         setPlayUrl(video_url);
         setMetaTitle(meta_title);
+        setMetaDescription(meta_description);
     }
 
     // playlist
@@ -329,7 +307,6 @@ export default () => {
     // change
     const handleSettingSave = () => {
         setSettingShow(false)
-        console.log(currentPlaylistTitle, currentPlaylistStatus)
         PlaylistService.changePlaylist(currentPlaylistId, currentPlaylistTitle, currentPlaylistStatus)
         .then(response => {
             if (response.data.message === 'success') {
@@ -340,6 +317,55 @@ export default () => {
             }
         })
     }
+
+    function meta_restriction_age_str( meta){
+		if( !meta)
+			return "";
+		return " [" + meta + "]";
+	}
+    
+    const onNextVideo = () => {
+        const index = videoData.findIndex(item => item.id == videoId);
+        if (index >= videoData.length - 1) {
+            return;
+        }
+        const nextUrl = videoData[index + 1].video_id;
+        setVideoId( videoData[index + 1].id);
+        setPlayUrl(nextUrl);
+        setMetaTitle( videoData[index + 1].meta_title + meta_restriction_age_str( videoData[index + 1].meta_restriction_age))
+        setMetaDescription( videoData[index + 1].meta_description )
+        setCurrentVideoNumber( getCurrentVideoNumber() + 1)
+    }
+
+    const onPreviousVideo = () => {
+        const index = videoData.findIndex(item => item.id == videoId);
+        if (index <= 0) {
+            return;
+        }
+        const prevUrl = videoData[index - 1].video_id;
+        setVideoId(videoData[index - 1].id);
+        setPlayUrl(prevUrl);
+        setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str( videoData[index - 1].meta_restriction_age))
+        setMetaDescription( videoData[index - 1].meta_description )
+        setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+    }
+
+    const onOpenSourceUrl = () => {
+		//beep();
+		//Pause curent video before launching a new one
+        const index = videoData.findIndex(item => item.id == videoId);
+        const nextUrl = videoData[index].video_id;
+		window.open( nextUrl, '_blank');
+	}
+
+	const getCurrentVideoNumber = () => {
+        return videoData.findIndex(item => item.id == videoId) + 1
+    }
+
+    const itemClick = (video_id) => {
+        setPlayUrl(video_id);
+    }
+
 
     const classes = useStyles();
 
@@ -454,6 +480,14 @@ export default () => {
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
                 metaTitle={metaTitle}
+                metaDescription={metaDescription}
+                videoData={videoData}
+                videoId={videoId}
+                onPreviousVideo={onPreviousVideo}
+                onNextVideo={onNextVideo}
+                onOpenSourceUrl={onOpenSourceUrl}
+                currentVideoNumber={currentVideoNumber}
+                itemClick={itemClick}
             />
             <SettingDialog
                 show={settingShow}
@@ -488,7 +522,7 @@ const VideoList = (props) => {
                    
                     <Row>
                         <Col>
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title)}>Play</Button>
+                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.meta_description)}>Play</Button>
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>

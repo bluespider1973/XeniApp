@@ -65,7 +65,7 @@ const sendSimpleMail = ({username, email, user_id, reset_key, type}, callback)=>
          if ( error) {
              val = "error";
              console.log("failed to send verify email a11 - " + error + " - " + info);
-             //console.log("credentials [" + config.GMAIL_ADDRESS + "] --> [" + config.GMAIL_PASSWORD + "]");
+             console.log("credentials [" + config.GMAIL_ADDRESS + "] --> [" + config.GMAIL_PASSWORD + "]");
          } else {
              val = "success";
              console.log("send verify email successfully a12");

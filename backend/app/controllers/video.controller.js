@@ -36,13 +36,20 @@ const uploadVideo = async(req, res)=>{
                     message: "Forbidden."
                 })
             }
-           
-            let meta_title, meta_image, meta_keyword, meta_description;
-            await getMetadata(video_id).then((metadata) => {
-                meta_title = metadata.title;
-                meta_image = metadata.image;
-                meta_keyword = metadata.keyword;
-                meta_description = metadata.description;
+
+            let meta_title, meta_image, meta_keyword, meta_description, meta_restriction_age;
+            await getMetadata(video_id).then(( metadata) => {
+                try{
+					console.log( metadata);
+					meta_title = metadata.title;
+					meta_image = metadata.image;
+					meta_keyword = metadata.keyword;
+					meta_description = metadata.description;
+					meta_restriction_age = metadata['og:restrictions:age'];
+					console.log( "og:restrictions:age=[" + meta_restriction_age + "]");
+				}catch( err_parse){
+					console.log( "parse eror of metadata=" + err_parse);
+				}
             },(error) => {
                 res.status(200).send({
                     message: error.message,
@@ -54,7 +61,8 @@ const uploadVideo = async(req, res)=>{
                 meta_title,
                 meta_image,
                 meta_keyword,
-                meta_description, 
+                meta_description,
+                meta_restriction_age,
             });
 
             user.addVideo(video).then(async result=>{
@@ -106,7 +114,7 @@ const addPlaylistIds = async(req, res)=>{
                     videoId: video_id
                 }
             })
-             
+
             playlist_ids.forEach( async item => {
                 await PlaylistVideo.create({
                     videoId: video_id,
@@ -162,7 +170,7 @@ const getPlaylistIds = async(req, res)=>{
                 message: 'success',
                 playlists: arr,
             })
-             
+
         }).catch(err=>{
             res.status(500).send({
                 message: err.message
@@ -186,21 +194,21 @@ const removeVideo = (req, res) =>{
         }
     }).then(async (user)=>{
         if(!user){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "User Not Found."
             });
         }
         if(user.access_key != user_key){
-            return res.status(400).send({                
+            return res.status(400).send({
                 message: "Invalid User Key."
             });
         }
-        
+
         const video = await Video.findOne({
             where: { id: id }
         });
         if(!video){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "Invalid Image Id."
             });
         }
@@ -228,21 +236,21 @@ const changeVideoGroup = (req, res) =>{
         }
     }).then(async (user)=>{
         if(!user){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "User Not Found."
             });
         }
         if(user.access_key != user_key){
-            return res.status(400).send({                
+            return res.status(400).send({
                 message: "Invalid User Key."
             });
         }
-        
+
         const video = await Video.findOne({
             where: { id: id }
         });
         if(!video){
-            return res.status(404).send({                
+            return res.status(404).send({
                 message: "Invalid Image Id."
             });
         }
@@ -292,7 +300,7 @@ const getAllVideoList = (req, res)=>{
                 meta_title: video.meta_title,
                 meta_image: video.meta_image,
                 meta_keyword: video.meta_keyword,
-                meta_description: video.meta_description, 
+                meta_description: video.meta_description,
                 playlist_id: video.playlist_id,
                 id_counter: list_counter++,
                 dateTime: video.createdAt,

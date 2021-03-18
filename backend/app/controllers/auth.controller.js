@@ -32,7 +32,6 @@ exports.signup = (req, res) => {
                 }
             }).then(roles => {
                 user.setRoles(roles).then(() => {
-                    console.log("asdf");
                     res.send({ message: "User was registered successfully." });
                 });
             })

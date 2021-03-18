@@ -74,12 +74,15 @@ exports.executeService = (req, res)=>{
                 if(user.nr_tokens==0){
                     return res.status(400).send({message: "Not Enough Tokens."});
                 }
-        		console.log( "get weater for=" + req.query.city + " from=" + WEATHER_API_URL);
-                axios.get(`${WEATHER_API_URL}key=${WEATHER_API_KEY}&q=${req.query.city}`)
+                let axios_weather_url = `${WEATHER_API_URL}key=${WEATHER_API_KEY}&q=${req.query.city}`;
+        		console.log( "get weater for=" + axios_weather_url);
+        		//console.log( "get weater for=" + req.query.city + " from=" + WEATHER_API_URL);
+                axios.get( axios_weather_url)
                     .then(response=>{
+        				console.log( "get weater axios returned");
                         let weather = {
                             city: response.data.location.name,
-                            weather: Math.round(response.data.current.temp_c)+" grades Celsius",
+                            weather: Math.round(response.data.current.temp_c) + " grades Celsius",
                             date: response.data.current.last_updated
                         }
                         user.update({nr_tokens: user.nr_tokens-1}).then(async r=>{

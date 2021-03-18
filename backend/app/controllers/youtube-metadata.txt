@@ -1,0 +1,103 @@
+{
+  url: 'https://www.youtube.com/watch?v=NYIwoGIpXNI',
+  canonical: 'https://www.youtube.com/watch?v=NYIwoGIpXNI',
+  title: '+18, Swiss Government Supported Body and ' +
+    'Freedom Festival, contains public nudity',
+  image: 'https://i.ytimg.com/vi/NYIwoGIpXNI/maxresdefault.jpg',
+  author: '',
+  description: 'If you want to earn money with your contents, please ' +
+    'check our platform: in ' +
+    'English:https://fullsepp.com/en/publications/118/basics-of-fullsepp/1/publication...',
+  keywords: 'Public Nudity, Nudity (Hobby), public, nudity, nu, body, freedom, ' +
+    'festival, naked, performance, urban, space, biel, bienne, bern, ' +
+    'switzerland, life, lifestyle, swinger, woman, nude, people, man, ' +
+    'sexy, female, girl, young, old, crowded, male, person, fashion, ' +
+    'model, party, adult, erotic, women, fetish, art, sexual, performing, ' +
+    'street, outdoor, pose, performer, swiss, city, town, europe, travel, ' +
+    'culture, day, famous, center, canton, village, men, lady, beautiful, ' +
+    'dancer',
+  source: 'www.youtube.com',
+  price: '',
+  priceCurrency: '',
+  availability: '',
+  robots: '',
+  'og:url': 'https://www.youtube.com/watch?v=NYIwoGIpXNI',
+  'og:locale': '',
+  'og:locale:alternate': '',
+  'og:title': '+18, Swiss Government Supported Body and ' +
+    'Freedom Festival, contains public nudity',
+  'og:type': 'video.other',
+  'og:description': 'If you want to earn money with your contents, please ' +
+    'check our platform: in ' +
+    'English:https://fullsepp.com/en/publications/118/basics-of-fullsepp/1/publication...',
+  'og:determiner': '',
+  'og:site_name': 'YouTube',
+  'og:image': 'https://i.ytimg.com/vi/NYIwoGIpXNI/maxresdefault.jpg',
+  'og:image:secure_url': '',
+  'og:image:type': '',
+  'og:image:width': '1280',
+  'og:image:height': '720',
+  'twitter:title': '+18, Swiss Government Supported Body and ' +
+    'Freedom Festival, contains public nudity',
+  'twitter:image': 'https://i.ytimg.com/vi/NYIwoGIpXNI/maxresdefault.jpg',
+  'twitter:image:alt': '',
+  'twitter:card': 'player',
+  'twitter:site': '@youtube',
+  'twitter:site:id': '',
+  'twitter:account_id': '',
+  'twitter:creator': '',
+  'twitter:creator:id': '',
+  'twitter:player': 'https://www.youtube.com/embed/NYIwoGIpXNI',
+  'twitter:player:width': '1280',
+  'twitter:player:height': '720',
+  'twitter:player:stream': '',
+  'theme-color': 'rgba(255, 255, 255, 0.98)',
+  'al:ios:app_store_id': '544007664',
+  'al:ios:app_name': 'YouTube',
+  'al:ios:url': 'vnd.youtube://www.youtube.com/watch?v=NYIwoGIpXNI&feature=applinks',
+  'al:android:url': 'vnd.youtube://www.youtube.com/watch?v=NYIwoGIpXNI&feature=applinks',
+  'al:web:url': 'http://www.youtube.com/watch?v=NYIwoGIpXNI&feature=applinks',
+  'og:video:url': 'https://www.youtube.com/embed/NYIwoGIpXNI',
+  'og:video:secure_url': 'https://www.youtube.com/embed/NYIwoGIpXNI',
+  'og:video:type': 'text/html',
+  'og:video:width': '1280',
+  'og:video:height': '720',
+  'al:android:app_name': 'YouTube',
+  'al:android:package': 'com.google.android.youtube',
+  'og:video:tag': 'dancer',
+  'fb:app_id': '87741124305',
+  'og:restrictions:age': '18+',
+  'twitter:url': 'https://www.youtube.com/watch?v=NYIwoGIpXNI',
+  'twitter:description': 'If you want to earn money with your contents, please ' +
+    'check our platform: in ' +
+    'English:https://fullsepp.com/en/publications/118/basics-of-fullsepp/1/publication...',
+  'twitter:app:name:iphone': 'YouTube',
+  'twitter:app:id:iphone': '544007664',
+  'twitter:app:name:ipad': 'YouTube',
+  'twitter:app:id:ipad': '544007664',
+  'twitter:app:url:iphone': 'vnd.youtube://www.youtube.com/watch?v=NYIwoGIpXNI&feature=applinks',
+  'twitter:app:url:ipad': 'vnd.youtube://www.youtube.com/watch?v=NYIwoGIpXNI&feature=applinks',
+  'twitter:app:name:googleplay': 'YouTube',
+  'twitter:app:id:googleplay': 'com.google.android.youtube',
+  'twitter:app:url:googleplay': 'https://www.youtube.com/watch?v=NYIwoGIpXNI',
+  name: '+18, Swiss Government Supported Body and ' +
+    'Freedom Festival, contains public nudity',
+  paid: 'False',
+  channelId: 'UCFNSjIA4YB9Cf6fzJaV3WnQ',
+  videoId: 'NYIwoGIpXNI',
+  duration: 'PT8M5S',
+  unlisted: 'False',
+  width: '1280',
+  height: '720',
+  playerType: 'HTML5 Flash',
+  isFamilyFriendly: 'false',
+  interactionCount: '77703985',
+  datePublished: '2015-09-11',
+  uploadDate: '2015-09-11',
+  genre: 'Travel & Events',
+  jsonld: {
+    '@context': 'http://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [ [Object] ]
+  }
+}

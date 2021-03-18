@@ -4,9 +4,8 @@ import { Pagination } from '@material-ui/lab';
 import TextField from '@material-ui/core/TextField';
 import SearchIcon from '@material-ui/icons/Search';
 import InputAdornment from '@material-ui/core/InputAdornment';
-import Modal from 'react-bootstrap/Modal';
-import ReactPlayer from 'react-player';
 import { useHistory } from "react-router-dom";
+import MyVerticallyCenteredModal from './MyVerticallyCenteredModal';
 
 import {
     Image,
@@ -38,35 +37,7 @@ const useStyles = makeStyles((theme) => ({
 
 const getVideoId = (url) => {
     return url.split("?v=")[1];
-} 
-
-const MyVerticallyCenteredModal = (props) => {
-
-    return (
-        <Modal
-            {...props}
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-        >
-            <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">
-                    {props.metaTitle}
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <ReactPlayer url={props.playUrl} playing={true} width='100%' controls={true} />
-            </Modal.Body>
-            <Modal.Footer>
-                {/* <p style={{marginRight: '5%'}}>{props.currentVideoNumber} of {Object.keys(props.videoData).length}</p> */}
-                <Button variant="primary" onClick={props.onPreviousVideo}>Previous</Button>
-                <Button style={{marginRight: '30px'}} variant="primary" onClick={props.onNextVideo}>Next</Button>
-                <Button variant="secondary" onClick={props.onHide}>Close</Button>
-            </Modal.Footer>
-        </Modal>
-    );
 }
-
 
 export default (props) => {
     const [pageNumber, setPageNumber] = React.useState(localStorage.getItem('videolistpage') ? Number(localStorage.getItem('videolistpage')) : 1);
@@ -80,7 +51,8 @@ export default (props) => {
     const [videoId, setVideoId] = useState(null);
     const [playlistId, setPlaylistId] = useState(null);
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
-    
+    const [metaDescription, setMetaDescription] = useState(null);
+
     let history = useHistory();
 
     useEffect(() => {
@@ -88,7 +60,7 @@ export default (props) => {
       if (localStorage.getItem("user") ) {
           getAllVideos();
       } else {
-          history.push("/404");
+          history.push("/signin");
       }
     }, [props])
 
@@ -96,7 +68,6 @@ export default (props) => {
      if (playlistId != null)
       PlaylistService.getPublicPlaylist(playlistId)
       .then(async response => {
-          console.log(response.data.length)
         if (response.data.message == 'cannot_access' || response.data.length == 0) {
             history.push("/404");
         }
@@ -104,7 +75,7 @@ export default (props) => {
 
             setVideoData(response.data)
             setVideoInfos(response.data);
-            
+
             const total = Math.ceil(response.data.length / itemsPerPage);
             setTotalPages(total);
         }
@@ -123,16 +94,16 @@ export default (props) => {
             fileName = fileName.trim().toLowerCase();
 
             if (keyword === "") {
-                return 1;    
+                return 1;
             }
-        
+
             if (fileName.includes(keyword)) {
                 return 1;
             }
         });
-        
+
         setVideoInfos(data);
-    
+
         const total = Math.ceil(data.length / itemsPerPage);
         setTotalPages(total);
 
@@ -140,12 +111,19 @@ export default (props) => {
         setPageNumber(1);
     }
 
+	function meta_restriction_age_str( meta){
+		if( !meta)
+			return "";
+		return " [" + meta + "]";
+	}
+
     // Play one video
-    const handlePlayVideo = (video_url, meta_title, videoId) => {
-        setModalShow(true);
-        setPlayUrl(video_url);
-        setMetaTitle(meta_title);
-        setVideoId(videoId);
+    const handlePlayVideo = (video_url, meta_title, videoId, meta_restriction_age, meta_description) => {
+        setModalShow( true);
+        setPlayUrl( video_url);
+        setMetaTitle( meta_title + meta_restriction_age_str( meta_restriction_age));
+        setMetaDescription(meta_description);
+        setVideoId( videoId);
     }
 
     const onNextVideo = () => {
@@ -154,10 +132,11 @@ export default (props) => {
             return;
         }
         const nextUrl = videoData[index + 1].video_id;
-        setVideoId(videoData[index + 1].id);
+        setVideoId( videoData[index + 1].id);
         setPlayUrl(nextUrl);
-        setMetaTitle(videoData[index + 1].meta_title)
-        setCurrentVideoNumber(getCurrentVideoNumber() + 1)
+        setMetaTitle( videoData[index + 1].meta_title + meta_restriction_age_str( videoData[index + 1].meta_restriction_age))
+        setMetaDescription( videoData[index + 1].meta_description )
+        setCurrentVideoNumber( getCurrentVideoNumber() + 1)
     }
 
     const onPreviousVideo = () => {
@@ -168,18 +147,36 @@ export default (props) => {
         const prevUrl = videoData[index - 1].video_id;
         setVideoId(videoData[index - 1].id);
         setPlayUrl(prevUrl);
-        setMetaTitle(videoData[index - 1].meta_title)
+        setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str( videoData[index - 1].meta_restriction_age))
+        setMetaDescription( videoData[index - 1].meta_description )
         setCurrentVideoNumber(getCurrentVideoNumber() - 1)
     }
 
-    const getCurrentVideoNumber = () => {
+	function beep() {
+		var snd = new Audio("data:audio/wav;base64,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qJrx4KOQjahZxWbcZgztj2c49nKmkId44S71j0c8eV9yDK6uPRzx5X18eDvjvQ6yKo9ZSS6l//8elePK/Lf//IInrOF/FvDoADYAGBMGb7FtErm5MXMlmPAJQVgWta7Zx2go+8xJ0UiCb8LHHdftWyLJE0QIAIsI+UbXu67dZMjmgDGCGl1H+vpF4NSDckSIkk7Vd+sxEhBQMRU8j/12UIRhzSaUdQ+rQU5kGeFxm+hb1oh6pWWmv3uvmReDl0UnvtapVaIzo1jZbf/pD6ElLqSX+rUmOQNpJFa/r+sa4e/pBlAABoAAAAA3CUgShLdGIxsY7AUABPRrgCABdDuQ5GC7DqPQCgbbJUAoRSUj+NIEig0YfyWUho1VBBBA//uQZB4ABZx5zfMakeAAAAmwAAAAF5F3P0w9GtAAACfAAAAAwLhMDmAYWMgVEG1U0FIGCBgXBXAtfMH10000EEEEEECUBYln03TTTdNBDZopopYvrTTdNa325mImNg3TTPV9q3pmY0xoO6bv3r00y+IDGid/9aaaZTGMuj9mpu9Mpio1dXrr5HERTZSmqU36A3CumzN/9Robv/Xx4v9ijkSRSNLQhAWumap82WRSBUqXStV/YcS+XVLnSS+WLDroqArFkMEsAS+eWmrUzrO0oEmE40RlMZ5+ODIkAyKAGUwZ3mVKmcamcJnMW26MRPgUw6j+LkhyHGVGYjSUUKNpuJUQoOIAyDvEyG8S5yfK6dhZc0Tx1KI/gviKL6qvvFs1+bWtaz58uUNnryq6kt5RzOCkPWlVqVX2a/EEBUdU1KrXLf40GoiiFXK///qpoiDXrOgqDR38JB0bw7SoL+ZB9o1RCkQjQ2CBYZKd/+VJxZRRZlqSkKiws0WFxUyCwsKiMy7hUVFhIaCrNQsKkTIsLivwKKigsj8XYlwt/WKi2N4d//uQRCSAAjURNIHpMZBGYiaQPSYyAAABLAAAAAAAACWAAAAApUF/Mg+0aohSIRobBAsMlO//Kk4soosy1JSFRYWaLC4qZBYWFRGZdwqKiwkNBVmoWFSJkWFxX4FFRQWR+LsS4W/rFRb/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////VEFHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU291bmRib3kuZGUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMjAwNGh0dHA6Ly93d3cuc291bmRib3kuZGUAAAAAAAAAACU=");
+		snd.play();
+	}
+
+    const onOpenSourceUrl = () => {
+		//beep();
+		//Pause curent video before launching a new one
+        const index = videoData.findIndex(item => item.id == videoId);
+        const nextUrl = videoData[index].video_id;
+		window.open( nextUrl, '_blank');
+	}
+
+	const getCurrentVideoNumber = () => {
         return videoData.findIndex(item => item.id == videoId) + 1
+    }
+
+    const itemClick = (video_id) => {
+        setPlayUrl(video_id);
     }
 
     return (
         <>
             {videoInfos &&
-                <VideoList 
+                <VideoList
                     videoInfos={videoInfos}
                     totalPages={totalPages}
                     itemsPerPage={itemsPerPage}
@@ -194,11 +191,14 @@ export default (props) => {
                 onHide={() => setModalShow(false)}
                 playUrl={playUrl}
                 metaTitle={metaTitle}
+                metaDescription={metaDescription}
                 videoData={videoData}
                 videoId={videoId}
                 onPreviousVideo={onPreviousVideo}
                 onNextVideo={onNextVideo}
+                onOpenSourceUrl={onOpenSourceUrl}
                 currentVideoNumber={currentVideoNumber}
+                itemClick={itemClick}
             />
         </>
     );
@@ -220,7 +220,9 @@ const VideoList = (props) => {
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
                     <p><small><i><span>Created Time : </span><span>{data.dateTime}</span></i></small></p>
-                    <Button variant="primary" size="sm" style={{padding: '5px 20px'}} className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.id)}>
+                    <Button variant="primary" size="sm" style={{padding: '5px 20px'}}
+                    	className="mr-2"
+                    	onClick={() => props.handlePlayVideo( data.video_id, data.meta_title, data.id, data.meta_restriction_age, data.meta_description)}>
                         Play Video
                     </Button>
                 </Media.Body>
