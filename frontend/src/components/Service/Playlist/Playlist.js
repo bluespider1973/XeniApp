@@ -362,8 +362,10 @@ export default () => {
         return videoData.findIndex(item => item.id == videoId) + 1
     }
 
-    const itemClick = (video_id) => {
+    const itemClick = (video_id, videoId) => {
         setPlayUrl(video_id);
+        setMetaTitle(videoData.find(item=>item.id == videoId).meta_title);
+        setMetaDescription(videoData.find(item=>item.id == videoId).meta_description);
     }
 
 

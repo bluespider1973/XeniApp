@@ -33,7 +33,7 @@ const MyVerticallyCenteredModal = (props) => {
                         {props.videoData.length > 0 &&
                             props.videoData.map(item => {
                                 return (
-                                    <Paper style={{cursor: 'pointer'}} onClick={() => props.itemClick(item.video_id)}><p style={{overflow: 'hidden', height: '25px'}}>{item.meta_title.substring(0, 18)+' ...'}</p></Paper>
+                                    <Paper style={{cursor: 'pointer'}} onClick={() => props.itemClick(item.video_id, item.id)}><p style={{overflow: 'hidden', height: '25px'}}>{item.meta_title.substring(0, 18)+' ...'}</p></Paper>
                                 )
                             })
                         }
