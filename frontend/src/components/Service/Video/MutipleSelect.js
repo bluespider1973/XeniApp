@@ -11,8 +11,8 @@ import VideoService from '../../../services/video.service';
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(0),
-    minWidth: 300,
-    maxWidth: 300,
+    minWidth: 200,
+    maxWidth: 250,
     float: 'right'
   },
   chips: {

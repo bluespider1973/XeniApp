@@ -225,6 +225,51 @@ const removeVideo = (req, res) =>{
     });
 }
 
+
+const setManualInfo = (req, res) =>{
+    const {user_id, user_key, manual_title, manual_description} = req.query;
+    const id = req.params.id;
+
+    User.findOne({
+        where: {
+            user_id: user_id
+        }
+    }).then(async (user)=>{
+        if(!user){
+            return res.status(404).send({
+                message: "User Not Found."
+            });
+        }
+        if(user.access_key != user_key){
+            return res.status(400).send({
+                message: "Invalid User Key."
+            });
+        }
+
+        const video = await Video.findOne({
+            where: { id: id }
+        });
+        if(!video){
+            return res.status(404).send({
+                message: "Invalid Image Id."
+            });
+        }
+        await video.update({
+            manual_title,
+            manual_description,
+        })
+
+        return res.status(200).send({
+            message: "success"
+        })
+
+    }).catch((err)=>{
+        return res.status(500).send({
+            message: err.message,
+        })
+    });
+}
+
 const changeVideoGroup = (req, res) =>{
     const {user_id, user_key, playlist_id} = req.query;
     const id = req.params.id;
@@ -316,6 +361,7 @@ module.exports = {
     addPlaylistIds,
     getPlaylistIds,
     removeVideo,
+    setManualInfo,
     changeVideoGroup,
     getAllVideoList,
 }

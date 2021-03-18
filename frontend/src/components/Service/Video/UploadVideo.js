@@ -10,6 +10,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import InputIcon from '@material-ui/icons/InsertLink';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import MyVerticallyCenteredModal from '../Playlist/MyVerticallyCenteredModal';
+import EditDialog from './EditDialog';
 
 import {
     Row,
@@ -70,6 +71,9 @@ const VideoUpload = () => {
     const [metaDescription, setMetaDescription] = useState(null);
     const [videoId, setVideoId] = useState(null);
     const [currentVideoNumber, setCurrentVideoNumber] = useState(1);
+    const [editShow, setEditShow] = useState(false);
+    const [manualTitle, setManualTitle] = useState(undefined);
+    const [manualDescription, setManualDescription] = useState(undefined);
     
     useEffect(() => {
         setExpand()
@@ -191,7 +195,7 @@ const VideoUpload = () => {
                         let selectedMonth = '';
                         let selectedDay = '';
         
-                        let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
+                        let fileName = item.meta_keyword + item.meta_description + item.meta_title + item.manual_description + item.manual_title + getVideoId(item.video_id);
                         fileName = fileName.trim().toLowerCase();
         
                         if (nodeId === 'root') {
@@ -268,7 +272,7 @@ const VideoUpload = () => {
             let selectedMonth = '';
             let selectedDay = '';
 
-            let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
+            let fileName = item.meta_keyword + item.meta_description + item.meta_title + item.manual_description + item.manual_title + getVideoId(item.video_id);
             fileName = fileName.trim().toLowerCase();
 
             if (nodeId === 'root') {
@@ -350,7 +354,7 @@ const VideoUpload = () => {
                 let selectedMonth = '';
                 let selectedDay = '';
 
-                let fileName = item.meta_keyword + item.meta_description + item.meta_title + getVideoId(item.video_id);
+                let fileName = item.meta_keyword + item.meta_description + item.meta_title + item.manual_description + item.manual_title + getVideoId(item.video_id);
                 fileName = fileName.trim().toLowerCase();
 
                 if (nodeId === 'root') {
@@ -523,6 +527,15 @@ const VideoUpload = () => {
         VideoService.changeVideoGroup(video_id, playlist_id)
     }
 
+    // edit save
+    const onSave = () => {
+        setEditShow(false);
+        VideoService.setManualInfo(videoId, manualTitle, manualDescription);
+        const index = videoData.findIndex(item => item.id == videoId);
+        videoData[index].manual_title = manualTitle;
+        videoData[index].manual_description = manualDescription;
+    }
+
     const classes = useStyles();
 
     const renderTree = (nodes) => {
@@ -594,6 +607,10 @@ const VideoUpload = () => {
                             handleRemoveItem={handleRemoveItem}
                             handlePlayVideo={handlePlayVideo}
                             onChangePlaylist={handlePlaylist}
+                            setEditShow={setEditShow}
+                            setManualTitle={setManualTitle}
+                            setManualDescription={setManualDescription}
+                            setVideoId={setVideoId}
                         />
                     }
                 </Col>
@@ -612,6 +629,15 @@ const VideoUpload = () => {
                 currentVideoNumber={currentVideoNumber}
                 itemClick={itemClick}
             />
+            <EditDialog
+                show={editShow}
+                onHide={() => setEditShow(false)}
+                manualTitle={manualTitle}
+                manualDescription={manualDescription}
+                setManualTitle={setManualTitle}
+                setManualDescription={setManualDescription}
+                onSave={onSave}
+            />
         </>
     );
 }
@@ -625,9 +651,9 @@ const VideoList = (props) => {
             <Media>
                 <Image thumbnail src={data.meta_image} className="mr-3" />
                 <Media.Body>
-                    <h5><span>{data.meta_title}</span></h5>
+                    <h5><span>{data.manual_title ? data.manual_title : data.meta_title}</span></h5>
                     <p style={{marginBottom: "0px"}}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
-                    <p style={{marginBottom: "2px"}}><span>{data.meta_description}</span></p>
+                    <p style={{marginBottom: "2px"}}><span>{data.manual_description ? data.manual_description : data.meta_description}</span></p>
                     {data.meta_keyword && (
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
@@ -636,6 +662,16 @@ const VideoList = (props) => {
                     <Row>
                         <Col>
                             <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo( data.video_id, data.meta_title, data.id, data.meta_restriction_age, data.meta_description)}>Play</Button>
+                            <Button variant="info" size="sm" className="mr-2" 
+                                onClick={() => {
+                                    props.setManualTitle(data.manual_title);
+                                    props.setManualDescription(data.manual_description);
+                                    props.setEditShow(true);
+                                    props.setVideoId(data.id);
+                                }}
+                            >
+                                Edit
+                            </Button>
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
