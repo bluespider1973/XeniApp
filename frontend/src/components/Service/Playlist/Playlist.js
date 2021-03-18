@@ -239,11 +239,12 @@ export default () => {
     }
 
     // Play one video
-    const handlePlayVideo = (video_url, meta_title, meta_description) => {
+    const handlePlayVideo = (video_url, meta_title, meta_description, video_id) => {
         setModalShow(true);
         setPlayUrl(video_url);
         setMetaTitle(meta_title);
         setMetaDescription(meta_description);
+        setVideoId(video_id);
     }
 
     // playlist
@@ -525,7 +526,7 @@ const VideoList = (props) => {
                    
                     <Row>
                         <Col>
-                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.meta_description)}>Play</Button>
+                            <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.meta_description, data.id)}>Play</Button>
                             <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>

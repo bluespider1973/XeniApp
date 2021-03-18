@@ -54,7 +54,7 @@ const MyVerticallyCenteredModal = (props) => {
                     <Col md={3} style={{borderLeft: '1px solid lightgray'}}>
                         <h5><u>More Videos</u></h5>
                         <Paper style={{height: 450, overflow: 'auto'}}>
-                        <List className={classes.root} style={{overflowY: 'auto'}} height='100%'>
+                        <List className={classes.root}>
                             
                             {props.videoData.length > 0 &&
                                 props.videoData.map(item => {
@@ -85,7 +85,6 @@ const MyVerticallyCenteredModal = (props) => {
                                             />
                                         </ListItem>
                                         <Divider variant="inset" component="li" />
-                                        {/* <Paper style={{cursor: 'pointer'}} ><p style={{overflow: 'hidden', height: '25px'}}>{item.meta_title.substring(0, 18)+' ...'}</p></Paper> */}
                                     </>
                                     )
                                 })
