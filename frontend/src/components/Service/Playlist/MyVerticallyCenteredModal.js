@@ -52,7 +52,7 @@ const MyVerticallyCenteredModal = (props) => {
                         <p><i>{props.metaDescription}</i></p>
                     </Col>
                     <Col md={3} style={{borderLeft: '1px solid lightgray'}}>
-                        <h5><u>More Videos</u></h5>
+                        <h5 style={{borderBottom: '1px solid lightgray', paddingBottom: 5, display: 'flex', justifyContent: 'center'}}>Video List</h5>
                         <Paper style={{height: 450, overflow: 'auto'}}>
                         <List className={classes.root}>
                             
@@ -69,7 +69,7 @@ const MyVerticallyCenteredModal = (props) => {
                                                 <Avatar alt="Remy Sharp" src={item.meta_image} />
                                             </ListItemAvatar>
                                             <ListItemText
-                                                primary={item.meta_title.substring(0, 20) + '...'}
+                                                primary={item.meta_title && item.meta_title.substring(0, 20) + '...'}
                                                 secondary={
                                                     <React.Fragment>
                                                     <Typography
@@ -78,7 +78,7 @@ const MyVerticallyCenteredModal = (props) => {
                                                         className={classes.inline}
                                                         color="textPrimary"
                                                     >
-                                                       {item.meta_description.substring(0, 38) + '...'}
+                                                       {item.meta_description && item.meta_description.substring(0, 38) + '...'}
                                                     </Typography>
                                                     </React.Fragment>
                                                 }

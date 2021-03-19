@@ -114,7 +114,7 @@ const SettingDialog = (props) => {
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="success" onClick={props.onSave}>Save</Button>
-                <Button variant="secondary" onClick={props.onDelete}>Delete</Button>
+                <Button variant="danger" onClick={props.onDelete}>Delete</Button>
                 <Button variant="primary" onClick={props.onHide}>Close</Button>
             </Modal.Footer>
         </Modal>
@@ -539,11 +539,11 @@ const VideoList = (props) => {
             <Media>
                 <Image thumbnail src={data.meta_image} className="mr-3" />
                 <Media.Body>
+                    <h5><span style={{color: 'green'}}>{data.manual_title && data.manual_title}</span></h5>
                     <h5><span>{data.meta_title}</span></h5>
-                    <h5><span style={{color: 'green'}}>{data.manual_title ? data.manual_title : 'No manual title'}</span></h5>
                     <p style={{marginBottom: "0px"}}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
+                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description && data.manual_description}</span></p>
                     <p style={{marginBottom: "2px"}}><span>{data.meta_description}</span></p>
-                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description ? data.manual_description : 'No manual description'}</span></p>
                     {data.meta_keyword && (
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
@@ -554,15 +554,15 @@ const VideoList = (props) => {
                             <Button variant="success" size="sm" className="mr-2" onClick={() => props.handlePlayVideo(data.video_id, data.meta_title, data.meta_description, data.id)}>Play</Button>
                             <Button variant="info" size="sm" className="mr-2" 
                                 onClick={() => {
-                                    props.setManualTitle(data.manual_title);
-                                    props.setManualDescription(data.manual_description);
+                                    props.setManualTitle(data.manual_title ? data.manual_title : data.meta_title);
+                                    props.setManualDescription(data.manual_description ? data.manual_description : data.meta_description);
                                     props.setEditShow(true);
                                     props.setVideoId(data.id);
                                 }}
                             >
                                 Edit
                             </Button>
-                            <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&

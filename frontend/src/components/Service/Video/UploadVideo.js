@@ -196,7 +196,7 @@ const VideoUpload = () => {
                         let selectedDay = '';
         
                         let fileName = item.meta_keyword + item.meta_description + item.meta_title + item.manual_description + item.manual_title + getVideoId(item.video_id);
-                        fileName = fileName.trim().toLowerCase();
+                        fileName = fileName ? fileName.trim().toLowerCase() : '';
         
                         if (nodeId === 'root') {
                                 return 1;
@@ -651,11 +651,11 @@ const VideoList = (props) => {
             <Media>
                 <Image thumbnail src={data.meta_image} className="mr-3" />
                 <Media.Body>
+                    <h5><span style={{color: 'green'}}>{data.manual_title && data.manual_title}</span></h5>
                     <h5><span>{data.meta_title}</span></h5>
-                    <h5><span style={{color: 'green'}}>{data.manual_title ? data.manual_title : 'No manual title'}</span></h5>
                     <p style={{marginBottom: "0px"}}><span>ID : </span><code>{getVideoId(data.video_id)}</code></p>
+                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description && data.manual_description}</span></p>
                     <p style={{marginBottom: "2px"}}><span>{data.meta_description}</span></p>
-                    <p style={{marginBottom: "2px"}}><span style={{color: 'green'}}>{data.manual_description ? data.manual_description : 'No manual description'}</span></p>
                     {data.meta_keyword && (
                         <p><small><span>Keywords : </span><span>{data.meta_keyword}</span></small></p>
                     )}
@@ -674,7 +674,7 @@ const VideoList = (props) => {
                             >
                                 Edit
                             </Button>
-                            <Button variant="primary" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
+                            <Button variant="danger" size="sm" onClick={() => props.handleRemoveItem(data.id)}>Remove</Button>
                         </Col>
                         <Col>
                             {props.playlists.length > 0 &&
