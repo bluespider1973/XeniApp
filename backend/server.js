@@ -33,6 +33,7 @@ require('./app/routes/image.routes')(app);
 require('./app/routes/ppt.routes')(app);
 require('./app/routes/video.routes')(app);
 require('./app/routes/playlist.routes')(app);
+require('./app/routes/receivedPlaylist.routes')(app);
 
 dotenv.config();
 

@@ -34,6 +34,7 @@ import EditPPT from './components/Service/PPT/EditPPT';
 // video
 import UploadVideo from './components/Service/Video/UploadVideo'
 import Playlist from './components/Service/Playlist/Playlist'
+import ReceivedPlaylist from './components/Service/ReceivedPlaylist/ReceivedPlaylist';
 import VideoList from './components/Service/Playlist/VideoList'
 
 function App() {
@@ -79,6 +80,7 @@ function App() {
                 <NavDropdown.Item href="/upload_image">Upload Image</NavDropdown.Item>
                 <NavDropdown.Item href="/upload_video">Upload Video</NavDropdown.Item>
                 <NavDropdown.Item href="/playlists">Manage Playlist</NavDropdown.Item>
+                <NavDropdown.Item href="/received_playlist">Received Playlists</NavDropdown.Item>
                 <NavDropdown.Item href="/manage_ppt/list">Manage PowerPoint</NavDropdown.Item>
               </NavDropdown>
               <NavDropdown title={currentUser.username} id="collasible-nav-dropdown" alignRight >
@@ -115,8 +117,9 @@ function App() {
           <Route path="/manage_ppt/list" component={PPTFileList} />
           <Route path="/manage_ppt/edit_ppt/:ppt_id" component={EditPPT} />
           <Route path="/upload_video" component={UploadVideo} />
-          <Route path="/playlists" component={Playlist} />
+          <Route path="/playlists" component={Playlist} />0
           <Route path="/playlist/:playlist_id" component={VideoList} />
+          <Route path="/received_playlist" component={ReceivedPlaylist} />
           <Route path="/user" component={BoardUser} />
           <Route path="/mod" component={BoardModerator} />
           <Route path="/admin" component={BoardAdmin} />

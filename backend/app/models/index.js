@@ -34,6 +34,7 @@ db.ppt = require('./ppt.model')(sequelize, Sequelize);
 db.video = require('./video.model')(sequelize, Sequelize);
 db.playlist = require('./playlist.model')(sequelize, Sequelize);
 db.playlistVideo = require('./playlistVideo.model')(sequelize, Sequelize);
+db.receivedPlaylist = require('./receivedPlaylist.model')(sequelize, Sequelize);
 
 db.role.belongsToMany(db.user, {
     through: "user_roles",
@@ -97,6 +98,15 @@ db.playlist.hasMany(db.playlistVideo, {
 db.playlistVideo.belongsTo(db.video);
 db.playlistVideo.belongsTo(db.playlist);
 db.playlistVideo.belongsTo(db.user);
+
+db.user.hasMany(db.receivedPlaylist, {
+    as: "ReceivedPlaylist"
+});
+db.playlist.hasMany(db.receivedPlaylist, {
+    as: "ReceivedPlaylist"
+});
+db.receivedPlaylist.belongsTo(db.user);
+db.receivedPlaylist.belongsTo(db.playlist);
 
 db.ROLES = ["user", "admin", "moderator"];
 
