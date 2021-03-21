@@ -4,11 +4,15 @@ require('dotenv').config();
 
 const User=db.user;
 const TokenHistory=db.tokenHistory;
+const TokenPrepaid=db.tokenPrepaid;
+const TokenAttempt=db.tokenAttempt;
+
 
 const WEATHER_API_URL = process.env.WEATHER_API_URL;
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 exports.addTokens=(req, res)=>{
+    console.log(req)
     User.findOne({
         where: {
             access_key: req.query.admin_key
@@ -57,6 +61,98 @@ exports.addTokens=(req, res)=>{
     }).catch(error=>{
         res.status(500).send({message: error.message});
     })
+}
+
+exports.addTokenCode = (req, res) => {
+    const {user_id, user_key, token_code} = req.query;
+
+    try{
+        User.findOne({
+            where: {
+                user_id: user_id
+            }
+        }).then(async user=>{
+            if(!user){
+                return res.status(404).send({
+                    message: "Invalid User Id."
+                });
+            }
+            if(user.access_key !== user_key){
+                return res.status(403).send({
+                    message: "Forbidden."
+                })
+            }
+        
+            // read token_code
+            const token = await TokenPrepaid.findOne({
+                where: {
+                    code: token_code,
+                    used: 0
+                }
+            })
+
+            if (token) {
+                await token.update({used: 1});
+                await user.update({nr_tokens: user.nr_tokens + token.nr_tokens});
+
+                return res.status(200).send({
+                    message: "success",
+                });
+            } else {
+                const registered = await TokenAttempt.findOne({
+                    where: {
+                        userId: user.id,
+                    }
+                });
+                // another try
+                if (registered) {
+                    let message = '';
+                    if (registered.count >= 5) {
+                        let passedMinutes = new Date(new Date() - new Date(registered.updatedAt)).getMinutes();
+                        if (passedMinutes >= 60) {
+                            await registered.update({count: 1});
+                            message = "Failed token code";
+                        } else {
+                            message = 'You can try again after 1 hour. ' + passedMinutes + ' mins passed.';
+                        }
+                    } else {
+                        await registered.update({count: registered.count + 1});
+                        message = "Failed token code, try count: " + registered.count;
+                    }
+
+                    return res.status(401).send({
+                        message: message,
+                    });
+
+                } else {
+                    // new try
+                    const attempt = await TokenAttempt.create({
+                        count: 1,
+                    })
+                    user.addTokenAttempt(attempt).then(async result => {
+                        return res.status(401).send({
+                            message: "Failed token code",
+                        });
+                    }).catch(err=>{
+                        res.status(500).send({
+                            message: err.message
+                        })
+                    })
+                }
+                
+
+            }
+
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message
+            });
+        })
+    } catch(err){
+        res.status(500).send({
+            message: err
+        })
+    }
 }
 
 exports.executeService = (req, res)=>{

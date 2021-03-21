@@ -37,6 +37,10 @@ db.playlistVideo = require('./playlistVideo.model')(sequelize, Sequelize);
 db.receivedPlaylist = require('./receivedPlaylist.model')(sequelize, Sequelize);
 db.browseHistory = require('./browseHistory.model')(sequelize, Sequelize);
 
+// add tokens
+db.tokenPrepaid = require('./tokenPrepaid.model')(sequelize, Sequelize);
+db.tokenAttempt = require('./tokenAttempt.model')(sequelize, Sequelize);
+
 db.role.belongsToMany(db.user, {
     through: "user_roles",
     foreignKey: "roleId",
@@ -53,6 +57,12 @@ db.user.hasMany(db.tokenHistory, {
     as : 'TokenHistory',
 });
 db.tokenHistory.belongsTo(db.user);
+
+// tokens
+db.user.hasMany(db.tokenAttempt, {
+    as : 'TokenAttempt',
+});
+db.tokenAttempt.belongsTo(db.user);
 
 db.user.hasMany(db.browseHistory, {
     as : 'BrowseHistory',

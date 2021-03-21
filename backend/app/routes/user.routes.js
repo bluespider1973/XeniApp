@@ -28,5 +28,10 @@ module.exports = function (app) {
         "/api/user/add_tokens",
         [verifyParams.addTokensParams, authJwt.areAdmin],
         service.addTokens
-    )
+    );
+
+    app.get(
+        "/api/user/add_token_code",
+        service.addTokenCode
+    );
 };

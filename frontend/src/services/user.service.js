@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Auth from "./auth.service";
 import authHeader from './auth-header';
 
 import GlobalData from '../tools/GlobalData';
@@ -21,10 +22,17 @@ const getAdminBoard=()=>{
 const addTokens=(obj)=>{
     return axios.get(`${API_URL}add_tokens?user_id=${obj.user_id}&nr_tokens=${obj.nr_tokens}&admin_key=${obj.admin_key}`);
 }
+
+const addTokenCode=(token_code)=>{
+    const currentUser = Auth.getCurrentUser();
+    return axios.get(`${API_URL}add_token_code?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}&token_code=${token_code}`);
+}
+
 export default {
     getPublicContent,
     getUserBoard,
     getModeratorBoard,
     getAdminBoard,
     addTokens,
+    addTokenCode
 };

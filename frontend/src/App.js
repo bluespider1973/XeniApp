@@ -37,6 +37,10 @@ import Playlist from './components/Service/Playlist/Playlist'
 import ReceivedPlaylist from './components/Service/ReceivedPlaylist/ReceivedPlaylist';
 import VideoList from './components/Service/Playlist/VideoList'
 
+// tokens
+import AddTokenCode from './components/User/AddTokenCode';
+
+
 function App() {
   const [showModeratorBoard, setShowModeratorBoard] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
@@ -84,6 +88,7 @@ function App() {
                 <NavDropdown.Item href="/manage_ppt/list">Manage PowerPoint</NavDropdown.Item>
               </NavDropdown>
               <NavDropdown title={currentUser.username} id="collasible-nav-dropdown" alignRight >
+                <NavDropdown.Item href="/add_token_code">Add Tokens</NavDropdown.Item>
                 <NavDropdown.Item href="/profile">View Profile</NavDropdown.Item>
                 <NavDropdown.Item href="/changePassword">Change Password</NavDropdown.Item>
                 <NavDropdown.Item href="/deregister">Deregister</NavDropdown.Item>
@@ -124,6 +129,7 @@ function App() {
           <Route path="/mod" component={BoardModerator} />
           <Route path="/admin" component={BoardAdmin} />
           <Route path="/add_tokens" component={BoardAdmin} />
+          <Route path="/add_token_code" component={AddTokenCode} />
           <Route path="*" component={NoMatch} />
         </Switch>
       </div>

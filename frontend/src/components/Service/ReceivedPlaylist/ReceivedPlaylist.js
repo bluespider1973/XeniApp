@@ -23,11 +23,7 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import {
   Row,
   Col,
-  Alert,
-  Image,
   Button,
-  ListGroup,
-  Media,
 } from 'react-bootstrap';
 
 import ReceivedPlaylistService from '../../../services/received-playlist.service';
