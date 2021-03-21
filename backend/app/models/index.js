@@ -35,6 +35,7 @@ db.video = require('./video.model')(sequelize, Sequelize);
 db.playlist = require('./playlist.model')(sequelize, Sequelize);
 db.playlistVideo = require('./playlistVideo.model')(sequelize, Sequelize);
 db.receivedPlaylist = require('./receivedPlaylist.model')(sequelize, Sequelize);
+db.browseHistory = require('./browseHistory.model')(sequelize, Sequelize);
 
 db.role.belongsToMany(db.user, {
     through: "user_roles",
@@ -52,6 +53,11 @@ db.user.hasMany(db.tokenHistory, {
     as : 'TokenHistory',
 });
 db.tokenHistory.belongsTo(db.user);
+
+db.user.hasMany(db.browseHistory, {
+    as : 'BrowseHistory',
+});
+db.browseHistory.belongsTo(db.user);
 
 db.user.hasMany(db.image, {
     as: "Image"
@@ -109,5 +115,8 @@ db.receivedPlaylist.belongsTo(db.user);
 db.receivedPlaylist.belongsTo(db.playlist);
 
 db.ROLES = ["user", "admin", "moderator"];
+
+
+
 
 module.exports= db;

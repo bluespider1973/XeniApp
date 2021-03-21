@@ -15,6 +15,10 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
+import TextField from '@material-ui/core/TextField';
+import SearchIcon from '@material-ui/icons/Search';
+import InsertLink from '@material-ui/icons/InsertLink';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 import {
   Row,
@@ -100,6 +104,10 @@ const useStyles2 = makeStyles({
   table: {
     minWidth: 500,
   },
+  pasteTextField: {
+    width: '100%',
+    marginBottom: 30
+  }
 });
 
 export default function CustomPaginationActionsTable() {
@@ -109,6 +117,9 @@ export default function CustomPaginationActionsTable() {
   const [data, setData] = useState([]);
   const [rows, setRows] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [newPlaylistUrl, setNewPlaylistUrl] = useState('');
+  const [searchString, setSearchString] = useState('');
+  const [errorText, setErrorText] = useState('');
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
 
@@ -134,80 +145,185 @@ export default function CustomPaginationActionsTable() {
     setPage(0);
   };
 
-  const handleDelete = (playlist_id) => {
-    
+  // playlistId
+  const handleDelete = (id) => {
+    ReceivedPlaylistService.removePlaylist(id)
+      .then(response => {
+          if (response.data.message === "success") {
+              window.location.reload();
+          }
+      }).catch((err) => {
+          const resMessage = (
+              err.response &&
+              err.response.data &&
+              err.response.data.message
+          ) || err.toString();
+
+          console.log(resMessage);
+      });
+  }
+
+  // custom
+  const handleInsertPlaylist = (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      addPlaylist();
+    }
+  }
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' || e.keyCode === 13) {
+      let arr = [...data];
+      arr = arr.filter(item => item.playlist_title.includes(e.target.value));
+      setRows(arr);
+    }
+  }
+
+  const handleAddPlaylist = () => {
+    addPlaylist();
+  }
+
+  function addPlaylist() {
+    const playlist_id = newPlaylistUrl.split('/playlist/')[1];
+    ReceivedPlaylistService.addPlaylist(playlist_id)
+      .then(response => {
+          if (response.data.message === "success") {
+              window.location.reload();
+          }
+          if (response.data.message === "cannotregister") {
+              setErrorText('The playlist is already registered.');
+              setTimeout(() => {
+                setErrorText('');
+              }, 2000);
+          }
+      }).catch((err) => {
+          const resMessage = (
+              err.response &&
+              err.response.data &&
+              err.response.data.message
+          ) || err.toString();
+
+          console.log(resMessage);
+      });
+
+    document.getElementById('input-with-icon-textfield').value = '';
+    setNewPlaylistUrl('');
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table className={classes.table} aria-label="custom pagination table">
-        <TableHead>
-          <TableRow>
-            <TableCell>No</TableCell>
-            <TableCell align="center">Playlist Title</TableCell>
-            <TableCell align="center">Sender</TableCell>
-            <TableCell align="center">Video Count</TableCell>
-            <TableCell align="center">Playlist Status</TableCell>
-            <TableCell align="center">Received Date</TableCell>
-            <TableCell align="center">Operate</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : rows
-          ).map((row, index) => (
-            <TableRow key={row.id}>
-              <TableCell component="th" scope="row">
-                {index + 1}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                {row.playlist_title}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                {row.sender_name}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                {row.video_count}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                {row.playlist_status ? 'Public' : 'Private'}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                {row.dateTime}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="center">
-                <Button size='sm' style={{marginRight: 5}} href={back_end_server + '/playlist/' + row.playlist_id} target='_blank'>Open</Button>
-                <Button size='sm' variant='danger' onClick={() => handleDelete(row.playlist_id)}>Delete</Button>
-              </TableCell>
+    <>
+      {errorText &&
+        <h3 style={{position: 'absolute', bottom: 100, right: 150, borderRadius: 5, background: 'rgba(0,200,50, 0.9)', padding: 30, width: 300, color: 'white'}}>{errorText}</h3>
+      }
+      <Row  className='mt-5'>
+        <Col md={5}>
+          <TextField
+            className={classes.pasteTextField}
+            id="input-with-icon-textfield"
+            placeholder="Paste playlist url."
+            onChange={(e) => setNewPlaylistUrl(e.target.value)}
+            onKeyDown={handleInsertPlaylist}
+            InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <InsertLink />
+                  </InputAdornment>
+            ),
+            }}
+          />
+        </Col>
+        <Col md={4}>
+          <Button size='sm' onClick={handleAddPlaylist}>
+            Add Playlist
+          </Button>
+        </Col>
+        <Col md={3}>
+          <TextField
+            className={classes.pasteTextField}
+            id="input-with-icon-textfield"
+            placeholder="Search"
+            onChange={(e) => setSearchString(e.target.value)}
+            onKeyDown={handleSearch}
+            InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon />
+                  </InputAdornment>
+            ),
+            }}
+          />
+        </Col>
+      </Row>
+      
+      <TableContainer component={Paper}>
+        <Table className={classes.table} aria-label="custom pagination table">
+          <TableHead>
+            <TableRow>
+              <TableCell>No</TableCell>
+              <TableCell align="center">Playlist Title</TableCell>
+              <TableCell align="center">Sender</TableCell>
+              <TableCell align="center">Video Count</TableCell>
+              <TableCell align="center">Playlist Status</TableCell>
+              <TableCell align="center">Received Date</TableCell>
+              <TableCell align="center">Operate</TableCell>
             </TableRow>
-          ))}
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : rows
+            ).map((row, index) => (
+              <TableRow key={row.id}>
+                <TableCell component="th" scope="row">
+                  {index + 1}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  {row.playlist_title}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  {row.sender_name}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  {row.video_count}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  {row.playlist_status ? 'Public' : 'Private'}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  {row.dateTime}
+                </TableCell>
+                <TableCell style={{ width: 160 }} align="center">
+                  <Button size='sm' style={{marginRight: 5}} href={back_end_server + '/playlist/' + row.playlist_id} target='_blank'>Open</Button>
+                  <Button size='sm' variant='danger' onClick={() => handleDelete(row.id)}>Delete</Button>
+                </TableCell>
+              </TableRow>
+            ))}
 
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={7}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { 'aria-label': 'rows per page' },
+                  native: true,
+                }}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={7}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              SelectProps={{
-                inputProps: { 'aria-label': 'rows per page' },
-                native: true,
-              }}
-              onChangePage={handleChangePage}
-              onChangeRowsPerPage={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </>
   );
 }

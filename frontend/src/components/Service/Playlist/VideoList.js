@@ -119,11 +119,25 @@ export default (props) => {
 
     // Play one video
     const handlePlayVideo = (video_url, meta_title, videoId, meta_restriction_age, meta_description) => {
-        setModalShow( true);
-        setPlayUrl( video_url);
-        setMetaTitle( meta_title + meta_restriction_age_str( meta_restriction_age));
-        setMetaDescription(meta_description);
-        setVideoId( videoId);
+        PlaylistService.addHistory(videoId)
+            .then(response => {
+                setModalShow(true);
+                setPlayUrl( video_url );
+                setMetaTitle( meta_title + meta_restriction_age_str( meta_restriction_age) );
+                setMetaDescription( meta_description );
+                setVideoId( videoId );
+            })
+            .catch((err) => {
+                const resMessage = (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                ) || err.toString();
+
+                if (err.response.data.message == 'Not Enough Tokens') {
+                    alert(resMessage + '\nPlease take your tokens.');
+                }
+            });
     }
 
     const onNextVideo = () => {
@@ -131,12 +145,25 @@ export default (props) => {
         if (index >= videoData.length - 1) {
             return;
         }
-        const nextUrl = videoData[index + 1].video_id;
-        setVideoId( videoData[index + 1].id);
-        setPlayUrl(nextUrl);
-        setMetaTitle( videoData[index + 1].meta_title + meta_restriction_age_str( videoData[index + 1].meta_restriction_age))
-        setMetaDescription( videoData[index + 1].meta_description )
-        setCurrentVideoNumber( getCurrentVideoNumber() + 1)
+
+        PlaylistService.addHistory(videoData[index + 1].id)
+            .then(response => {
+                const nextUrl = videoData[index + 1].video_id;
+                setVideoId( videoData[index + 1].id);
+                setPlayUrl(nextUrl);
+                setMetaTitle( videoData[index + 1].meta_title + meta_restriction_age_str( videoData[index + 1].meta_restriction_age))
+                setMetaDescription( videoData[index + 1].meta_description )
+                setCurrentVideoNumber( getCurrentVideoNumber() + 1)
+            })
+            .catch((err) => {
+                const resMessage = (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                ) || err.toString();
+
+                alert(resMessage + '\nPlease take your tokens.');
+            });
     }
 
     const onPreviousVideo = () => {
@@ -144,12 +171,25 @@ export default (props) => {
         if (index <= 0) {
             return;
         }
-        const prevUrl = videoData[index - 1].video_id;
-        setVideoId(videoData[index - 1].id);
-        setPlayUrl(prevUrl);
-        setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str( videoData[index - 1].meta_restriction_age))
-        setMetaDescription( videoData[index - 1].meta_description )
-        setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+        
+        PlaylistService.addHistory(videoData[index - 1].id)
+            .then(response => {
+                const prevUrl = videoData[index - 1].video_id;
+                setVideoId(videoData[index - 1].id);
+                setPlayUrl(prevUrl);
+                setMetaTitle(videoData[index - 1].meta_title + meta_restriction_age_str( videoData[index - 1].meta_restriction_age))
+                setMetaDescription( videoData[index - 1].meta_description )
+                setCurrentVideoNumber(getCurrentVideoNumber() - 1)
+            })
+            .catch((err) => {
+                const resMessage = (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                ) || err.toString();
+
+                alert(resMessage + '\nPlease take your tokens.');
+            });
     }
 
 	function beep() {
@@ -162,6 +202,7 @@ export default (props) => {
 		//Pause curent video before launching a new one
         const index = videoData.findIndex(item => item.id == videoId);
         const nextUrl = videoData[index].video_id;
+        PlaylistService.addHistory(videoId);
 		window.open( nextUrl, '_blank');
 	}
 
@@ -169,11 +210,23 @@ export default (props) => {
         return videoData.findIndex(item => item.id == videoId) + 1
     }
 
-    const itemClick = (video_id, videoId) => {
-        setPlayUrl(video_id);
-        setVideoId(videoId);
-        setMetaTitle(videoData.find(item=>item.id == videoId).meta_title);
-        setMetaDescription(videoData.find(item=>item.id == videoId).meta_description);
+    const itemClick = (video_id, ivideoId) => {
+        PlaylistService.addHistory(ivideoId)
+            .then(response => {
+                setPlayUrl(video_id);
+                setVideoId(ivideoId);
+                setMetaTitle(videoData.find(item=>item.id == ivideoId).meta_title);
+                setMetaDescription(videoData.find(item=>item.id == ivideoId).meta_description);
+            })
+            .catch((err) => {
+                const resMessage = (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                ) || err.toString();
+
+                alert(resMessage + '\nPlease take your tokens.');
+            });
     }
 
     return (

@@ -9,8 +9,10 @@ const User = db.user;
 const Playlist = db.playlist;
 const PlaylistVideo = db.playlistVideo;
 const Video = db.video;
+const BrowseHistory = db.browseHistory;
 
 var global_data = require('../tools/GlobalData');
+const { video } = require('../models');
 const API_URL = global_data.back_end_server_ip + ':' + global_data.back_end_server_port + '/api/image/getImageFile/';
 
 
@@ -46,6 +48,90 @@ const addPlaylist = async(req, res)=>{
                 res.status(200).send({
                     message: "success",
                 });
+            }).catch(err=>{
+                res.status(500).send({
+                    message: err.message
+                })
+            })
+
+        }).catch(err=>{
+            res.status(500).send({
+                message: err.message
+            });
+        })
+    } catch(err){
+        res.status(500).send({
+            message: err
+        })
+    }
+}
+
+const addHistory = async(req, res)=>{
+    const {user_id, access_key, video_id } = req.query;
+    try{
+        User.findOne({
+            where: {
+                user_id: user_id
+            }
+        }).then(async user=>{
+            if(!user){
+                return res.status(404).send({
+                    message: "Invalid User Id."
+                });
+            }
+            if(user.access_key !== access_key){
+                return res.status(403).send({
+                    message: "Forbidden."
+                })
+            }
+            
+            const video = await Video.findOne({
+                where: {
+                    id: video_id
+                }
+            })
+
+            // other user video check
+            if (video.userId == user.id) {
+                // no need to add if current user
+                return res.status(200).send({
+                    message: "success",
+                });
+            }
+            
+            const registered = await BrowseHistory.findOne({
+                where: {
+                    video_id,
+                }
+            });
+
+            // add once
+            if (registered) {
+                return res.status(200).send({
+                    message: "success",
+                });
+            }
+            
+            if(user.nr_tokens<=0){
+                return res.status(401).send({
+                    message: "Not Enough Tokens"
+                })
+            }
+
+            // add to browse_history table
+            const oneVideo = await BrowseHistory.create({
+                video_id,
+            });
+
+            // add userId to browse_history table row
+            user.addBrowseHistory(oneVideo).then(async result=>{
+                console.log('added new row on browse_history')
+                await user.update({nr_tokens: user.nr_tokens-1});
+
+                res.status(200).send({
+                    message: "success",
+                });
+
             }).catch(err=>{
                 res.status(500).send({
                     message: err.message
@@ -334,6 +420,7 @@ const getPublicPlaylist = (req, res)=>{
 
 module.exports = {
     addPlaylist,
+    addHistory,
     removePlaylist,
     changePlaylist,
     getAllPlaylist,

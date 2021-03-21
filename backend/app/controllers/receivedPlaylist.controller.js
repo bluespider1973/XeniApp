@@ -47,6 +47,20 @@ const addPlaylist = async(req, res)=>{
                 });
             }
 
+
+            const isSaved = await ReceivedPlaylist.findAll({
+                where: {
+                    playlistId: playlist_id.id
+                }
+            })
+
+            if (isSaved.length > 0) {
+                return res.status(200).send({
+                    message: "cannotregister",
+                });
+            }
+
+
             const receivedPlaylist = await ReceivedPlaylist.create({
                 playlistId : playlist_id.id
             });
@@ -92,8 +106,8 @@ const removePlaylist = (req, res) =>{
             });
         }
 
-        const playlist = await Playlist.findOne({
-            where: { playlist_id: id }
+        const playlist = await ReceivedPlaylist.findOne({
+            where: { playlistId: id }
         });
         if(!playlist){
             return res.status(404).send({
@@ -102,7 +116,7 @@ const removePlaylist = (req, res) =>{
         }
 
         await playlist.destroy();
-
+        
         return res.status(200).send({
             message: "success"
         })

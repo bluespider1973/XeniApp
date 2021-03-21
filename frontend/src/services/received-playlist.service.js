@@ -15,7 +15,7 @@ class PlaylistService {
 
   removePlaylist(id) {
     const currentUser = Auth.getCurrentUser();
-    return axios.post(`${PLAYLIST_API_URL}removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
+    return axios.post(`${PLAYLIST_API_URL}received/removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
   }
 
   changePlaylist(id, currentPlaylistTitle, currentPlaylistStatus) {

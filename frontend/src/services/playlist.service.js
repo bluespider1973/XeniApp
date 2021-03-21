@@ -13,6 +13,12 @@ class PlaylistService {
     return axios.post(`${PLAYLIST_API_URL}addPlaylist?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&playlist_title=${playlist_title}&playlist_status=${playlist_status}`);
   }
 
+  addHistory(video_id) {
+    const currentUser = Auth.getCurrentUser();
+    return axios.post(`${PLAYLIST_API_URL}addHistory?user_id=${currentUser.user_id}&access_key=${currentUser.access_key}&video_id=${video_id}`);
+  }
+
+
   removePlaylist(id) {
     const currentUser = Auth.getCurrentUser();
     return axios.post(`${PLAYLIST_API_URL}removePlaylist/${id}?user_id=${currentUser.user_id}&user_key=${currentUser.access_key}`);
